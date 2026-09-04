@@ -4,7 +4,6 @@ const tableData = {
     interpretation: "Pool D direct is the content-fidelity endpoint. On the same repaired evidence, CSG improves Q-Full UD and nearly eliminates acoustic speaker drift, but it does not replace the direct endpoint.",
     rows: [
       ["Primary WeSep", "baseline", "13.68", "7.00", "6.98", ".449", "3.688 P.808", "—"],
-      ["TF-map single expert", "single expert", "8.56", "2.72", "2.55", ".491", "3.718 P.808", "—"],
       ["Pool D direct", "repair endpoint", "6.54", ".88", ".78", ".506", "3.699 P.808", "—", "best"],
       ["Pool D → Q-Full UD", "ungrounded", "14.08", "1.00", ".43", ".422", "3.705 P.808", "—", "grounded"],
       ["Pool D → fixed CSG", "grounded", "12.74", "1.00", ".23", ".422", "3.699 P.808", "—", "grounded"],
@@ -16,7 +15,6 @@ const tableData = {
     interpretation: "DEV is intentionally preserved. Pool D direct is the fidelity endpoint; fixed CSG is the selected generative reliability endpoint. Adaptive CSG and GNR are negative ablations.",
     rows: [
       ["Primary WeSep", "baseline", "53.50", "20.11", "19.54", ".269", "2.243 OVRL", "1.997"],
-      ["TF-map single expert", "single expert", "pending matched DEV cache", "—", "—", "—", "—", "—"],
       ["Pool D direct", "repair endpoint", "46.75", "11.86", "10.93", ".332", "2.132 OVRL", "1.930", "best"],
       ["Pool D → Q-Full UD", "ungrounded", "66.87", "13.68", "2.99", ".362", "3.063 OVRL", "3.164", "grounded"],
       ["Pool D → fixed CSG", "selected grounded", "62.66", "13.44", "1.27", ".370", "3.066 OVRL", "3.047", "grounded"],
@@ -29,7 +27,6 @@ const tableData = {
     interpretation: "This block remains blank until the ledger is COMPLETE and the final report passes validation. DEV evidence remains available in its own tab.",
     rows: [
       ["Primary WeSep", "baseline", "—", "—", "—", "—", "—", "—"],
-      ["TF-map single expert", "single expert", "—", "—", "—", "—", "—", "—"],
       ["Pool D direct", "repair endpoint", "—", "—", "—", "—", "—", "—", "best"],
       ["Pool D → Q-Full UD", "ungrounded", "—", "—", "—", "—", "—", "—", "grounded"],
       ["Pool D → fixed CSG", "selected grounded", "—", "—", "—", "—", "—", "—", "grounded"],
