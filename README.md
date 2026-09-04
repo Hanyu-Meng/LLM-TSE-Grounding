@@ -15,8 +15,30 @@ therefore separates the problem into two stages:
 
 This repository is the cleaned, portable core of the larger experimental
 pipeline used for an ICASSP 2027 study. It intentionally contains method code,
-small tests, frozen configuration metadata, and compact result summaries—not
-server orchestration or generated research assets.
+small tests, frozen configuration metadata, compact result summaries, the
+paper source, and a curated listening demo. It does not contain server
+orchestration, checkpoints, manifests, private paths, or bulk generated
+outputs.
+
+## Paper and interactive demo
+
+- [`paper/`](paper/) contains the compact ICASSP manuscript source and the
+  latest rendered draft. Table 1 is reserved for frozen TEST results; Table 2
+  permanently preserves the full Noisy DEV selection and ablation evidence.
+- [`demo/`](demo/) contains a standalone research-story page with three
+  independent result views: Clean TEST, Noisy DEV, and Noisy TEST. Importing a
+  completed Noisy TEST payload updates only the Noisy TEST view and never
+  overwrites DEV.
+
+Run the demo locally:
+
+```bash
+python -m http.server 8000 --directory demo
+```
+
+Then open `http://127.0.0.1:8000/`. The demo links back to this repository so
+the narrative, frozen configuration, method implementation, and paper source
+remain traceable from one place.
 
 ## Method at a glance
 
@@ -129,6 +151,13 @@ tests/
   test_core.py             # invariant and regression tests
 results/
   noisy_dev_summary.csv    # compact source data for the table above
+paper/
+  main.tex                 # ICASSP manuscript
+  results_macros.tex       # centralized frozen result values
+  tables/                  # TEST, DEV-ablation, mechanism, and cost tables
+demo/
+  index.html               # standalone paper/demo page
+  app.js                   # split-safe result rendering
 docs/
   CODE_MAP.md              # mapping from internal campaign code
   REPRODUCIBILITY.md       # leakage and evaluation boundaries
@@ -193,12 +222,15 @@ system builds on:
 - [LibriMix](https://github.com/JorisCos/LibriMix) and WHAM! noise for the noisy
   evaluation setting.
 
-Data, checkpoints, generated audio, transcripts, embeddings, and server-specific
-paths are intentionally excluded. Each external component remains subject to
-its own license and usage terms.
+Data, checkpoints, bulk generated audio, transcripts, embeddings, and
+server-specific paths are intentionally excluded. A small set of curated clean
+listening examples is included under `demo/public/assets/audio/` solely to make
+the paper's failure-and-repair cases inspectable. Each external component and
+source corpus remains subject to its own license and usage terms.
 
 ## Status
 
-The compact method core and frozen Noisy DEV snapshot are available here. The
-one-run frozen Noisy TEST evaluation is not included until its full pipeline and
-artifact checks are complete. No post-TEST tuning is permitted.
+The compact method core, manuscript, demo, frozen Clean TEST evidence, and full
+Noisy DEV snapshot are available here. The one-run frozen Noisy TEST evaluation
+is not inserted until its full pipeline and artifact checks are complete. No
+post-TEST tuning is permitted.

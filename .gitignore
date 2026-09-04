@@ -45,3 +45,7 @@ analysis/
 *.onnx
 *.jsonl
 *.log
+
+# Curated, small listening examples intentionally shipped with the paper demo.
+!demo/public/assets/audio/
+!demo/public/assets/audio/**
