@@ -1,0 +1,7 @@
+system,raw_wer_percent,content_switch_percent,acoustic_switch_percent,speaker_margin,dnsmos_ovrl,utmos,trials
+Primary WeSep,53.50,20.11,19.54,0.269,2.243,1.997,8400
+Pool-D direct,46.75,11.86,10.93,0.332,2.132,1.930,8400
+Q-Full UD,66.87,13.68,2.99,0.362,3.063,3.164,8400
+Fixed CSG,62.66,13.44,1.27,0.370,3.066,3.047,8400
+Adaptive CSG,62.92,13.42,1.64,0.369,3.079,3.104,8400
+Selected GNR K20-R2,65.96,13.44,1.67,0.369,3.081,3.118,8400

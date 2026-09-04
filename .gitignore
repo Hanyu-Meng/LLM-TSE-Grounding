@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+build/
+dist/
+.venv/
+venv/
+
+# Editors and operating systems
+.DS_Store
+.idea/
+.vscode/
+
+# Secrets and local configuration
+.env
+.env.*
+*.key
+*.pem
+
+# Research data and generated artifacts
+data/
+datasets/
+manifests/
+checkpoints/
+pretrained/
+external/
+runs/
+logs/
+outputs/
+artifacts/
+analysis/
+*.wav
+*.flac
+*.mp3
+*.npy
+*.npz
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.jsonl
+*.log
