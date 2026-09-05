@@ -12,6 +12,9 @@ therefore separates the problem into two stages:
    target-enrollment speaker consistency to select the most reliable evidence.
 2. **Grounded generation:** constrain LLM audio-token decoding to remain close
    to the repaired evidence in the native FSQ code space.
+3. **Content-preserving fallback (experimental):** use grounded output only
+   for low-confidence evidence and fall back to the repaired direct waveform
+   when token drift or an enabled output-only guard is unsafe.
 
 This repository is the cleaned, portable core of the larger experimental
 pipeline used for an ICASSP 2027 study. It intentionally contains method code,
@@ -104,6 +107,22 @@ The logits are computed once with teacher forcing over the **immutable original
 anchor**. Refined tokens never feed later histories. DEV selected `K=20, R=2`
 within the GNR family, but GNR did not outperform fixed CSG overall.
 
+### 4. Content-preserving grounding gate (DEV-only)
+
+`content_gate.py` implements a fail-closed gate between Pool-D direct and CSG.
+The token-only operating point uses only target-enrollment cosine and the CSG
+token-flip rate. An optional stronger guard can also reject implausible word
+rate, repeated ASR bigrams, or low output-only DNSMOS. None of these inputs
+uses clean target audio, the paired interferer, a reference transcript, WER,
+or SI-SDR.
+
+On the frozen 8,400-trial Noisy DEV outputs, the token-only gate reduces raw
+WER from 62.66% for always-on fixed CSG to 54.03%, with acoustic switching at
+1.86%. The exploratory stronger guard reaches 48.99% WER and 2.12% acoustic
+switching. These are retrospective DEV analyses, not frozen Noisy TEST claims;
+the stronger guard also needs independent-ASR or listening validation before
+paper use.
+
 ## Frozen Noisy DEV snapshot
 
 All rows contain the same 8,400 DEV trials. These are DEV results, not final
@@ -139,6 +158,7 @@ src/llm_tse_grounding/
   candidate_selection.py  # deterministic Pool-D selector
   fsq.py                   # 3^8 FSQ conversion and Hamming geometry
   csg.py                   # CSG logit penalty
+  content_gate.py          # inference-only direct/grounded safety gate
   gnr.py                   # immutable-anchor neighborhood refinement
   difficulty.py            # deployable residual-ratio ablation
   statistics.py            # Wilson CI and paired bootstrap
