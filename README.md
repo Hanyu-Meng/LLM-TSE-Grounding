@@ -123,12 +123,6 @@ switching. These are retrospective DEV analyses, not frozen Noisy TEST claims;
 the stronger guard also needs independent-ASR or listening validation before
 paper use.
 
-`scripts/evaluate_content_gate.py` reproduces this comparison from cached
-per-trial direct/CSG metrics, CSG token diagnostics, candidate similarities,
-and manifest metadata. It writes every arm choice, aggregate and per-condition
-CSVs, and mixture-cluster bootstrap confidence intervals without decoding new
-audio or reading TEST outcomes.
-
 ## Frozen Noisy DEV snapshot
 
 All rows contain the same 8,400 DEV trials. These are DEV results, not final
