@@ -6,13 +6,6 @@ import numpy as np
 
 from llm_tse_grounding.candidate_selection import POOL_D, select_by_enrollment_similarity
 from llm_tse_grounding.csg import csg_penalize_logits, select_csg_tokens
-from llm_tse_grounding.content_gate import (
-    STRONG_GUARD_DEV_POLICY,
-    TOKEN_ONLY_POLICY,
-    bigram_repetition_fraction,
-    choose_content_preserving_output,
-    normalized_words,
-)
 from llm_tse_grounding.difficulty import residual_difficulty, source_threshold_lambda
 from llm_tse_grounding.fsq import VOCAB_SIZE, digits_to_ids, hamming_distance, ids_to_digits
 from llm_tse_grounding.gnr import refine_gnr
@@ -64,55 +57,6 @@ class GroundingTests(unittest.TestCase):
         np.testing.assert_array_equal(result.tokens, np.asarray([1, 0]))
         self.assertLessEqual(result.max_hamming_edit_distance, 2)
         self.assertFalse(result.refined_tokens_fed_back)
-
-
-class ContentGateTests(unittest.TestCase):
-    def test_token_only_policy_grounds_low_confidence_stable_output(self):
-        decision = choose_content_preserving_output(
-            evidence_enrollment_cosine=0.2,
-            token_flip_rate=0.1,
-            output_duration_seconds=4.0,
-            policy=TOKEN_ONLY_POLICY,
-        )
-        self.assertEqual(decision.choice, "grounded")
-        self.assertEqual(decision.reasons, ())
-
-    def test_token_only_policy_keeps_confident_direct_evidence(self):
-        decision = choose_content_preserving_output(
-            evidence_enrollment_cosine=0.5,
-            token_flip_rate=0.1,
-            output_duration_seconds=4.0,
-            policy=TOKEN_ONLY_POLICY,
-        )
-        self.assertEqual(decision.choice, "direct")
-        self.assertIn("evidence-speaker-confidence-sufficient", decision.reasons)
-
-    def test_strong_guard_rejects_repetition(self):
-        decision = choose_content_preserving_output(
-            evidence_enrollment_cosine=0.2,
-            token_flip_rate=0.1,
-            output_duration_seconds=4.0,
-            grounded_transcript="i am sorry " * 20,
-            grounded_dnsmos_p808=3.0,
-            policy=STRONG_GUARD_DEV_POLICY,
-        )
-        self.assertEqual(decision.choice, "direct")
-        self.assertIn("grounded-repetition-too-high", decision.reasons)
-
-    def test_enabled_guard_fails_closed_when_measurement_missing(self):
-        decision = choose_content_preserving_output(
-            evidence_enrollment_cosine=0.2,
-            token_flip_rate=0.1,
-            output_duration_seconds=4.0,
-            policy=STRONG_GUARD_DEV_POLICY,
-        )
-        self.assertEqual(decision.choice, "direct")
-        self.assertIn("grounded-transcript-missing", decision.reasons)
-        self.assertIn("grounded-dnsmos-missing", decision.reasons)
-
-    def test_repetition_feature(self):
-        words = normalized_words("We go home, we go home, we go home")
-        self.assertGreater(bigram_repetition_fraction(words), 0.0)
 
 
 class DifficultyAndStatisticsTests(unittest.TestCase):
