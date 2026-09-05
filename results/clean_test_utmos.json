@@ -1,0 +1,26 @@
+{
+  "status": "COMPLETE",
+  "scope": "frozen-output post-hoc metric-only evaluation",
+  "split": "clean TEST",
+  "expected_per_system": 6000,
+  "failed_per_system": 0,
+  "decoder_rerun": false,
+  "system_or_threshold_tuning": false,
+  "metric": {
+    "name": "UTMOS22 strong",
+    "reference_free": true,
+    "input": "full output resampled to mono 16 kHz",
+    "speechmos_version": "v1.2.0",
+    "speechmos_commit": "ed25eacbfa42b99156c36ebec67a733b5dbb9b79",
+    "weight": "utmos22_strong_step7459_v1.pt",
+    "weight_sha256": "38aa51ab79e2a4e09a1449758a4b37e9cbb2e8235a49662a732d33a9ba1e9bff"
+  },
+  "systems": [
+    {"id": "primary_wesep", "display_name": "Primary WeSep", "completed": 6000, "utmos": 3.606285262883},
+    {"id": "tfmap_context_single", "display_name": "TF-map/context WeSep", "completed": 6000, "utmos": 3.702206565738},
+    {"id": "pool_d_selected", "display_name": "Pool D direct", "completed": 6000, "utmos": 3.647283282598},
+    {"id": "pool_d_qfull_ud", "display_name": "Pool D to Q-Full UD", "completed": 6000, "utmos": 3.913620667716},
+    {"id": "pool_d_qfull_csg", "display_name": "Pool D to fixed CSG", "completed": 6000, "utmos": 3.909825650215},
+    {"id": "pool_d_qfull_csg_gnr_k20_r2", "display_name": "Pool D to fixed CSG to GNR (K20/R2)", "completed": 6000, "utmos": 3.914867912730}
+  ]
+}
