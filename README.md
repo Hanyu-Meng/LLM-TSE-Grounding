@@ -100,7 +100,6 @@ within the GNR family, but GNR did not outperform fixed CSG overall.
 | `scripts/tse_noisy_wham/` | WHAM! preparation, noisy candidate analysis, CSG/GNR decoding, frozen protocol checks, evaluation, and paired statistics |
 | `configs/tse_*.yaml` | Portable examples of the experiment configuration |
 | `tests/` | Lightweight operator tests and TSE data/model contract tests |
-| `paper/` | ICASSP manuscript source and rendered draft |
 | `demo/` | Standalone project/demo page |
 
 General speech-enhancement training and evaluation utilities that are not used
@@ -192,13 +191,14 @@ python -m compileall -q src se_align scripts tests
 Read [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md) before adapting the
 pipeline or interpreting the result tables.
 
-## Paper and demo
+## Project demo
 
-- [`paper/`](paper/) contains the ICASSP manuscript source and latest bundled
-  draft available in this repository snapshot.
 - [`demo/`](demo/) contains a standalone local project page.
 - The public listening page is maintained separately at
   [hanyu-meng.github.io/LLM-TSE-Grounding-Demo](https://hanyu-meng.github.io/LLM-TSE-Grounding-Demo/).
+
+The manuscript source and PDF are confidential and are not distributed in
+this repository.
 
 Run the bundled demo locally:
 
