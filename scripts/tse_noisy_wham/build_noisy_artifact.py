@@ -23,8 +23,8 @@ def read_csv(name: str) -> list[dict]:
         "LPS", "SpeechBERTScore", "P808", "SIG", "BAK", "OVRL", "UTMOS",
         "SNR_dB", "p95_Raw_WER", "High_Error", "Mean_Lambda",
         "CSG_Modified_Rate", "GNR_Edit_Rate", "Primary_Swap_Count",
-        "Primary_Swap_Rate", "Pool_D_Availability", "Pool_D_Oracle_Recovery",
-        "Pool_D_Cosine_Recovery", "Selector_Oracle_Gap", "Control_Regression",
+        "Primary_Swap_Rate", "CDCS5_Availability", "CDCS5_Oracle_Recovery",
+        "CDCS5_Cosine_Recovery", "Selector_Oracle_Gap", "Control_Regression",
         "p50_Raw_WER", "p90_Raw_WER", "p99_Raw_WER",
         "Worst_50_Mean_Raw_WER", "Worst_100_Mean_Raw_WER",
         "Worst_200_Mean_Raw_WER", "Worst_10pct_Mean_Raw_WER",
@@ -77,12 +77,12 @@ def main() -> int:
     verdict = json.loads((OUT / "scientific_verdict.json").read_text())["verdicts"]
     by_code = {row["Code"]: row for row in test_main}
     headline = [{
-        "pool_d_swap_recovery": cand["pool_d_selected_recovery_rate_on_primary_swaps"],
-        "pool_d_oracle": cand["pool_d_oracle_recovery_rate_on_primary_swaps"],
-        "pool_d_control_regression": cand["pool_d_control_regression_rate"],
+        "cdcs5_swap_recovery": cand["cdcs5_direct_recovery_rate_on_primary_swaps"],
+        "cdcs5_oracle": cand["cdcs5_oracle_recovery_rate_on_primary_swaps"],
+        "cdcs5_control_regression": cand["cdcs5_control_regression_rate"],
         "primary_wer": by_code["D0"]["WER"],
-        "pool_d_wer": by_code["D3"]["WER"],
-        "qfull_wer": by_code["G2"]["WER"],
+        "cdcs5_wer": by_code["D3"]["WER"],
+        "qwen_tse_wer": by_code["G2"]["WER"],
         "adaptive_wer": by_code["G5"]["WER"],
         "gnr_wer": by_code["G6"]["WER"],
     }]
@@ -99,24 +99,24 @@ def main() -> int:
                "Candidate availability, selector recovery, complementarity, and regression."),
         source("tail_source", "Frozen tail table",
                "results/noisy_tse/TAIL_ROBUSTNESS_TABLE.csv",
-               "Raw-WER tails using Q-Full-UD-ranked common subsets."),
+               "Raw-WER tails using Qwen-TSE-UD-ranked common subsets."),
     ]
     cards = [
         {"id": "repair_card", "dataset": "headline", "sourceId": "confusion_source",
-         "description": "Share of noisy primary swaps corrected by frozen Pool D cosine selection.",
-         "metrics": [{"label": "Pool D swap recovery", "field": "pool_d_swap_recovery", "format": "percent"},
-                     {"label": "Oracle availability", "field": "pool_d_oracle", "format": "percent"}]},
+         "description": "Share of noisy primary swaps corrected by frozen CDCS-5 cosine selection.",
+         "metrics": [{"label": "CDCS-5 swap recovery", "field": "cdcs5_swap_recovery", "format": "percent"},
+                     {"label": "Oracle availability", "field": "cdcs5_oracle", "format": "percent"}]},
         {"id": "regression_card", "dataset": "headline", "sourceId": "confusion_source",
          "description": "Wrong-target regression among noisy-primary-correct controls.",
-         "metrics": [{"label": "Control regression", "field": "pool_d_control_regression", "format": "percent"}]},
+         "metrics": [{"label": "Control regression", "field": "cdcs5_control_regression", "format": "percent"}]},
         {"id": "wer_card", "dataset": "headline", "sourceId": "main_source",
-         "description": "Natural TEST target WER for primary and direct Pool D outputs.",
-         "metrics": [{"label": "Pool D direct WER", "field": "pool_d_wer", "format": "percent"},
+         "description": "Natural TEST target WER for primary and direct CDCS-5 outputs.",
+         "metrics": [{"label": "CDCS-5 direct WER", "field": "cdcs5_wer", "format": "percent"},
                      {"label": "Primary WER", "field": "primary_wer", "format": "percent"}]},
         {"id": "grounding_card", "dataset": "headline", "sourceId": "main_source",
          "description": "Natural TEST WER across unrestricted, adaptive, and local-refinement generation.",
          "metrics": [{"label": "Adaptive CSG WER", "field": "adaptive_wer", "format": "percent"},
-                     {"label": "Q-Full UD", "field": "qfull_wer", "format": "percent"},
+                     {"label": "Qwen-TSE UD", "field": "qwen_tse_wer", "format": "percent"},
                      {"label": "GNR-LLM", "field": "gnr_wer", "format": "percent"}]},
     ]
     charts = [
@@ -150,7 +150,7 @@ def main() -> int:
              {"field": "BAK", "label": "BAK", "format": "number"},
              {"field": "UTMOS", "label": "UTMOS", "format": "number"},
          ]},
-        {"id": "tail_table", "title": "Common Q-Full-UD-ranked reliability tails",
+        {"id": "tail_table", "title": "Common Qwen-TSE-UD-ranked reliability tails",
          "dataset": "test_tail", "sourceId": "tail_source", "layout": "full",
          "defaultSort": {"field": "Worst_100_Mean_Raw_WER", "direction": "asc"}, "density": "dense",
          "columns": [
@@ -166,7 +166,7 @@ def main() -> int:
         {"id": "title", "type": "markdown", "layout": "full",
          "body": "# Repair Before Grounding: Noisy TSE Results\n\nFrozen ICASSP 2027 robustness study."},
         {"id": "answer", "type": "markdown", "layout": "full",
-         "body": ("## Answer first\n\nPool D repair: **" + verdict["NOISY_POOL_D_REPAIR"]
+         "body": ("## Answer first\n\nCDCS-5 repair: **" + verdict["NOISY_CDCS5_REPAIR"]
                   + "**. Fixed/adaptive grounding: **" + verdict["FIXED_CSG_CONTENT_CONTROL"]
                   + "/" + verdict["ADAPTIVE_CSG_VALUE"] + "**. GNR quality/content: **"
                   + verdict["GNR_QUALITY_RECOVERY"] + "/" + verdict["GNR_CONTENT_PRESERVATION"]
@@ -183,7 +183,7 @@ def main() -> int:
          "body": "## Natural noisy TEST result\n\nThe six rows are the complete paper mainline."},
         {"id": "main", "type": "table", "tableId": "main_table", "layout": "full"},
         {"id": "tail_heading", "type": "markdown", "layout": "full",
-         "body": "## Tail robustness\n\nEvery method is evaluated on the same Q-Full-UD-ranked worst-case IDs."},
+         "body": "## Tail robustness\n\nEvery method is evaluated on the same Qwen-TSE-UD-ranked worst-case IDs."},
         {"id": "tail", "type": "table", "tableId": "tail_table", "layout": "full"},
         {"id": "caveats", "type": "markdown", "layout": "full",
          "body": "## Caveats\n\nWER is frozen ASR consistency. DNSMOS and UTMOS are model-based estimates. The deployable difficulty residual contains interferer speech, ambient noise, and extraction error. STOI/ESTOI/PESQ and generative SI-SDR are diagnostic only."},

@@ -10,8 +10,8 @@
 
 ## Inference boundary
 
-Pool-D selection may use only the mixture, target enrollment, frozen extractor
-outputs, and target-enrollment speaker similarity. Clean target audio,
+CDCS-2/CDCS-5 selection may use only the mixture, target enrollment, frozen
+extractor outputs, and target-enrollment speaker similarity. Clean target audio,
 interferer audio, transcripts, WER, and SI-SDR are evaluation-only.
 
 CSG receives the selected evidence tokens and changes only the audio-token
@@ -20,7 +20,7 @@ anchor. Refined GNR tokens are never fed into later histories.
 
 ## Code and artifact boundary
 
-The repository includes the curated TSE model, data contracts, candidate
+The repository includes only the paper-aligned TSE model, data contracts, CDCS
 selection, grounding, synthesis adapters, evaluation, statistics, and report
 generation code. It does not redistribute LibriSpeech, LibriMix/WHAM!, model
 weights, generated audio, speaker embeddings, token caches, ASR transcripts,

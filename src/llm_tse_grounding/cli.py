@@ -10,7 +10,7 @@ from typing import Any
 
 import numpy as np
 
-from .candidate_selection import POOL_D, select_from_candidate_record
+from .candidate_selection import CDCS5_CANDIDATES, select_from_candidate_record
 from .csg import select_csg_tokens
 from .difficulty import residual_difficulty, source_threshold_lambda
 from .gnr import refine_gnr
@@ -37,7 +37,7 @@ def _read_jsonl(path: Path) -> list[dict[str, Any]]:
 
 
 def _select(args: argparse.Namespace) -> int:
-    order = tuple(part.strip() for part in args.pool.split(",") if part.strip())
+    order = tuple(part.strip() for part in args.candidate_order.split(",") if part.strip())
     rows = _read_jsonl(args.input)
     output = []
     for row in rows:
@@ -93,7 +93,11 @@ def build_parser() -> argparse.ArgumentParser:
     select = sub.add_parser("select", help="run target-enrollment cosine selection")
     select.add_argument("--input", type=Path, required=True, help="candidate JSONL")
     select.add_argument("--output", type=Path, required=True, help="selection JSONL")
-    select.add_argument("--pool", default=",".join(POOL_D), help="ordered candidate names")
+    select.add_argument(
+        "--candidate-order",
+        default=",".join(CDCS5_CANDIDATES),
+        help="ordered CDCS candidate names",
+    )
     select.add_argument("--score-key", default="speaker_similarity_to_enrollment")
     select.set_defaults(func=_select)
 

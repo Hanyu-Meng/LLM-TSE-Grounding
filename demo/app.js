@@ -1,25 +1,25 @@
 const tableData = {
   clean: {
     intro: "Held-out frozen TEST · 6,000 trials. Lower is better for WER and switch rates; higher is better for speaker margin and P.808.",
-    interpretation: "Pool D direct is the content-fidelity endpoint. On the same repaired evidence, CSG improves Q-Full UD and nearly eliminates acoustic speaker drift, but it does not replace the direct endpoint.",
+    interpretation: "CDCS-5 direct is the content-fidelity endpoint. On the same repaired evidence, CSG improves Qwen-TSE UD and nearly eliminates acoustic speaker drift, but it does not replace the direct endpoint.",
     rows: [
       ["Primary WeSep", "baseline", "13.68", "7.00", "6.98", ".449", "3.688 P.808", "—"],
-      ["Pool D direct", "repair endpoint", "6.54", ".88", ".78", ".506", "3.699 P.808", "—", "best"],
-      ["Pool D → Q-Full UD", "ungrounded", "14.08", "1.00", ".43", ".422", "3.705 P.808", "—", "grounded"],
-      ["Pool D → fixed CSG", "grounded", "12.74", "1.00", ".23", ".422", "3.699 P.808", "—", "grounded"],
-      ["Pool D → selected GNR", "local refinement", "pending", "—", "—", "—", "—", "—", "grounded"],
+      ["CDCS-5 direct", "repair endpoint", "6.54", ".88", ".78", ".506", "3.699 P.808", "—", "best"],
+      ["Qwen-TSE UD", "ungrounded", "14.08", "1.00", ".43", ".422", "3.705 P.808", "—", "grounded"],
+      ["Qwen-TSE fixed CSG", "grounded", "12.74", "1.00", ".23", ".422", "3.699 P.808", "—", "grounded"],
+      ["Qwen-TSE GNR", "local refinement", "pending", "—", "—", "—", "—", "—", "grounded"],
     ],
   },
   noisyDev: {
     intro: "Frozen Noisy DEV · 8,400 trials (6,000 natural + 2,400 controlled). Used for selection and ablation; never relabelled as TEST.",
-    interpretation: "DEV is intentionally preserved. Pool D direct is the fidelity endpoint; fixed CSG is the selected generative reliability endpoint. Adaptive CSG and GNR are negative ablations.",
+    interpretation: "DEV is intentionally preserved. CDCS-5 direct is the fidelity endpoint; Qwen-TSE fixed CSG is the selected generative reliability endpoint. Qwen-TSE adaptive CSG and GNR are negative ablations.",
     rows: [
       ["Primary WeSep", "baseline", "53.50", "20.11", "19.54", ".269", "2.243 OVRL", "1.997"],
-      ["Pool D direct", "repair endpoint", "46.75", "11.86", "10.93", ".332", "2.132 OVRL", "1.930", "best"],
-      ["Pool D → Q-Full UD", "ungrounded", "66.87", "13.68", "2.99", ".362", "3.063 OVRL", "3.164", "grounded"],
-      ["Pool D → fixed CSG", "selected grounded", "62.66", "13.44", "1.27", ".370", "3.066 OVRL", "3.047", "grounded"],
-      ["Pool D → adaptive CSG", "negative ablation", "62.92", "13.42", "1.64", ".369", "3.079 OVRL", "3.104", "grounded"],
-      ["Pool D → GNR K20/R2", "negative ablation", "65.96", "13.44", "1.67", ".369", "3.081 OVRL", "3.118", "grounded"],
+      ["CDCS-5 direct", "repair endpoint", "46.75", "11.86", "10.93", ".332", "2.132 OVRL", "1.930", "best"],
+      ["Qwen-TSE UD", "ungrounded", "66.87", "13.68", "2.99", ".362", "3.063 OVRL", "3.164", "grounded"],
+      ["Qwen-TSE fixed CSG", "selected grounded", "62.66", "13.44", "1.27", ".370", "3.066 OVRL", "3.047", "grounded"],
+      ["Qwen-TSE adaptive CSG", "negative ablation", "62.92", "13.42", "1.64", ".369", "3.079 OVRL", "3.104", "grounded"],
+      ["Qwen-TSE adaptive CSG+GNR", "negative ablation", "65.96", "13.44", "1.67", ".369", "3.081 OVRL", "3.118", "grounded"],
     ],
   },
   noisyTest: {
@@ -27,11 +27,11 @@ const tableData = {
     interpretation: "This block remains blank until the ledger is COMPLETE and the final report passes validation. DEV evidence remains available in its own tab.",
     rows: [
       ["Primary WeSep", "baseline", "—", "—", "—", "—", "—", "—"],
-      ["Pool D direct", "repair endpoint", "—", "—", "—", "—", "—", "—", "best"],
-      ["Pool D → Q-Full UD", "ungrounded", "—", "—", "—", "—", "—", "—", "grounded"],
-      ["Pool D → fixed CSG", "selected grounded", "—", "—", "—", "—", "—", "—", "grounded"],
-      ["Pool D → adaptive CSG", "negative ablation", "—", "—", "—", "—", "—", "—", "grounded"],
-      ["Pool D → GNR K20/R2", "negative ablation", "—", "—", "—", "—", "—", "—", "grounded"],
+      ["CDCS-5 direct", "repair endpoint", "—", "—", "—", "—", "—", "—", "best"],
+      ["Qwen-TSE UD", "ungrounded", "—", "—", "—", "—", "—", "—", "grounded"],
+      ["Qwen-TSE fixed CSG", "selected grounded", "—", "—", "—", "—", "—", "—", "grounded"],
+      ["Qwen-TSE adaptive CSG", "negative ablation", "—", "—", "—", "—", "—", "—", "grounded"],
+      ["Qwen-TSE adaptive CSG+GNR", "negative ablation", "—", "—", "—", "—", "—", "—", "grounded"],
     ],
   },
 };

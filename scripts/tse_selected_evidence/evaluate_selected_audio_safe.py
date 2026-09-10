@@ -37,8 +37,8 @@ def parse_args() -> argparse.Namespace:
         "--selected-waveform-field",
         choices=(
             "evidence_wav", "mixture_wav", "tfmap_context_waveform",
-            "pool_full_selected_waveform",
-            "pool_b_selected_waveform", "pool_d_selected_waveform",
+            "primary_selected_waveform",
+            "cdcs2_direct_waveform", "cdcs5_direct_waveform",
         ),
     )
     source.add_argument("--token-records", type=Path)

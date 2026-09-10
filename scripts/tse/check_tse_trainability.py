@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run one real Q-Full batch to verify trainable S3 and projector parameters."""
+"""Run one real Qwen-TSE batch to verify trainable S3 and projector parameters."""
 
 from __future__ import annotations
 

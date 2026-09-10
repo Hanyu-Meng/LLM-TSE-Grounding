@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prepare leak-free noisy candidate inputs and assemble frozen Pool B/D choices."""
+"""Prepare leak-free noisy inputs and assemble frozen CDCS-2/CDCS-5 choices."""
 
 from __future__ import annotations
 
@@ -19,9 +19,9 @@ ANALYSIS = ROOT / "analysis/noisy_wham"
 MANIFESTS = ROOT / "manifests/noisy_wham"
 ORDER = ("full", "first", "middle", "final", "tfmap_context_full")
 POOLS = {
-    "pool_full": ("full",),
-    "pool_b": ("full", "tfmap_context_full"),
-    "pool_d": ORDER,
+    "primary": ("full",),
+    "cdcs2": ("full", "tfmap_context_full"),
+    "cdcs5": ORDER,
 }
 
 
@@ -310,9 +310,9 @@ def assemble(args: argparse.Namespace) -> int:
         evaluation.append(source | {
             "candidates": evaluation_candidates,
             "selected": selected,
-            "pool_b_selected_waveform": candidates[selected["pool_b"]]["waveform_path"],
-            "pool_d_selected_waveform": candidates[selected["pool_d"]]["waveform_path"],
-            "pool_full_selected_waveform": candidates["full"]["waveform_path"],
+            "cdcs2_direct_waveform": candidates[selected["cdcs2"]]["waveform_path"],
+            "cdcs5_direct_waveform": candidates[selected["cdcs5"]]["waveform_path"],
+            "primary_selected_waveform": candidates["full"]["waveform_path"],
         })
     output = split_dir / args.scope
     atomic_jsonl(output / "candidates_deployment.jsonl", deployment)

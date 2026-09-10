@@ -18,12 +18,12 @@ ANALYSIS = ROOT / "analysis/selected_evidence"
 GATE = ROOT / "analysis/candidate_gate"
 ORDER = ("full", "first", "middle", "final", "tfmap_context_full")
 POOLS = {
-    "Pool A": ("full",),
-    "Pool B": ("full", "tfmap_context_full"),
-    "Pool C": ("full", "first", "middle", "final"),
-    "Pool D": ORDER,
+    "Primary-only": ("full",),
+    "CDCS-2": ("full", "tfmap_context_full"),
+    "WeSep multiview": ("full", "first", "middle", "final"),
+    "CDCS-5": ORDER,
 }
-POOL_KEYS = {"Pool A": "pool_a", "Pool B": "pool_b", "Pool C": "pool_c", "Pool D": "pool_d"}
+POOL_KEYS = {"Primary-only": "primary_only", "CDCS-2": "cdcs2", "WeSep multiview": "wesep_multiview", "CDCS-5": "cdcs5"}
 
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -126,7 +126,7 @@ def main() -> int:
             correct = [bool(value["target_correct"]) for value in values]
             csv_rows.append({
                 "candidate_pool": pool_name,
-                "pool_candidates": "+".join(names),
+                "candidate_names": "+".join(names),
                 "cohort": cohort_name,
                 "trials": len(rows),
                 "selected_candidate_counts": json.dumps(dict(Counter(choices)), sort_keys=True),

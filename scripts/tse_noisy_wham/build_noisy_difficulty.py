@@ -108,7 +108,7 @@ def residual(inference_path: Path, output: Path, status_every: int) -> int:
     records = []
     for index, row in enumerate(rows, 1):
         mixture = load_mono(row["mixture_wav"])
-        evidence = load_mono(row["pool_d_evidence_waveform"])
+        evidence = load_mono(row["cdcs5_evidence_waveform"])
         if len(mixture) != len(evidence):
             raise ValueError(f"residual length mismatch: {row['trial_id']}")
         dot = float(np.dot(mixture, evidence))

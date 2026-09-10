@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Decode fixed-length Q-Full TSE S3 tokens with UD or training-free CSG."""
+"""Decode fixed-length Qwen-TSE TSE S3 tokens with UD or training-free CSG."""
 
 from __future__ import annotations
 

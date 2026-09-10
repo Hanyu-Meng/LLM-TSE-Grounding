@@ -12,10 +12,12 @@ steps:
 2. **Grounded generation.** Constrain autoregressive S3-token generation to
    remain close to the selected evidence in the native FSQ code space.
 
-This private repository now contains both the small NumPy reference operators
-and the curated end-to-end research pipeline used for the ICASSP 2027 study.
-Data, model weights, generated audio, caches, machine orchestration, and private
-server paths are deliberately excluded.
+This private repository contains the compact NumPy reference operators and the
+paper-aligned research pipeline used for the ICASSP 2027 study. Public method
+names follow the manuscript throughout the code, configurations, reports, and
+demo. Legacy lettered candidate-pool names are intentionally not used. Data,
+model weights, generated experiment artifacts, machine orchestration, and
+private server paths are excluded.
 
 ## Method overview
 
@@ -30,7 +32,7 @@ flowchart LR
     W2 --> C
     E --> S[Enrollment-consistency selector]
     C --> S
-    S --> D[Pool-D direct output]
+    S --> D[CDCS-5 direct output]
     S --> Z[S3 evidence tokens]
     Z --> Q[Qwen-TSE]
     Q --> G[Code-space grounding]
@@ -38,9 +40,10 @@ flowchart LR
     G --> R[Optional GNR ablation]
 ```
 
-### Pool-D confusion repair
+### Conditioning-diverse candidate selection (CDCS)
 
-Pool-D contains five frozen candidates:
+`CDCS-2` uses the full-enrolment outputs of the two frozen WeSep checkpoints.
+`CDCS-5` adds early, middle, and late views from the primary checkpoint:
 
 - `full`, `first`, `middle`, and `final` from one speaker-embedding TSE model
   with deterministic enrollment views;
@@ -74,7 +77,7 @@ The frozen reliability operating point uses `lambda=1` and temporal tolerance
 GNR is a conservative ablation around a complete CSG anchor:
 
 ```text
-candidate set = TopK(Q-Full logits) ∩ HammingBall_R(anchor) ∪ {anchor}
+candidate set = TopK(Qwen-TSE logits) ∩ HammingBall_R(anchor) ∪ {anchor}
 ```
 
 Teacher-forced logits are computed against the immutable original anchor;
@@ -85,22 +88,23 @@ within the GNR family, but GNR did not outperform fixed CSG overall.
 
 | Path | Purpose |
 |---|---|
-| `src/llm_tse_grounding/` | Lightweight NumPy implementations of Pool-D selection, FSQ geometry, CSG, GNR, and paired statistics |
+| `src/llm_tse_grounding/` | Lightweight NumPy implementations of CDCS-5 selection, FSQ geometry, CSG, GNR, and paired statistics |
 | `se_align/tse/` | Qwen/WavLM target-speaker token model |
-| `se_align/train/` | Token vocabulary, projectors, datasets, and training utilities |
+| `se_align/train/` | Qwen-TSE token vocabulary and FSQ-neighbour geometry |
 | `se_align/codec/` | CosyVoice3 S3 tokenizer and waveform synthesis adapter |
 | `se_align/data/` | Manifest, waveform, token, and TSE dataset contracts |
-| `se_align/eval/` | ASR-consistency, speaker, intrusive, and perceptual metric implementations |
+| `se_align/eval/` | Metrics used by the paper evaluation scripts |
 | `scripts/tse/` | Manifest preparation, feature extraction, training, decoding, and baseline evaluation |
 | `scripts/tse_candidate_gate/` | Frozen WeSep candidate generation, embedding extraction, scoring, selection, and validation |
-| `scripts/tse_selected_evidence/` | Clean selected-evidence tokenization, generation, evaluation, and paper-table compilation |
+| `scripts/tse_selected_evidence/` | Clean CDCS evidence tokenization, Qwen-TSE decoding, evaluation, and paper-table compilation |
 | `scripts/tse_noisy_wham/` | WHAM! preparation, noisy candidate analysis, CSG/GNR decoding, frozen protocol checks, evaluation, and paired statistics |
 | `configs/tse_*.yaml` | Portable examples of the experiment configuration |
 | `tests/` | Lightweight operator tests and TSE data/model contract tests |
 | `paper/` | ICASSP manuscript source and rendered draft |
 | `demo/` | Standalone project/demo page |
 
-The detailed stage-by-stage entry points are documented in
+General speech-enhancement training and evaluation utilities that are not used
+by this paper have been removed. The detailed stage-by-stage entry points are documented in
 [`docs/PIPELINE.md`](docs/PIPELINE.md). The relationship between the compact
 operators and full research scripts is documented in
 [`docs/CODE_MAP.md`](docs/CODE_MAP.md); the lab5090 synchronization audit is in

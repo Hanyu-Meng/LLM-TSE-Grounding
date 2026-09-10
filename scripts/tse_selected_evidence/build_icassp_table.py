@@ -28,40 +28,40 @@ SYSTEMS: OrderedDict[str, dict[str, Any]] = OrderedDict([
         "path": ROOT / "dev_outputs/WeSep/per_trial_metrics.jsonl",
         "pool": "full", "kind": "deterministic",
     }),
-    ("Pool B Selected Candidate", {
-        "path": SYSTEM_ROOT / "pool_b_selected/per_trial_metrics.jsonl",
+    ("CDCS-2 direct", {
+        "path": SYSTEM_ROOT / "cdcs2_direct/per_trial_metrics.jsonl",
         "pool": "full+tfmap_context_full", "kind": "deterministic",
     }),
-    ("Pool D Selected Candidate", {
-        "path": SYSTEM_ROOT / "pool_d_selected/per_trial_metrics.jsonl",
+    ("CDCS-5 direct", {
+        "path": SYSTEM_ROOT / "cdcs5_direct/per_trial_metrics.jsonl",
         "pool": "all five", "kind": "deterministic",
     }),
-    ("Pool D Selected S3 Recon", {
-        "path": SYSTEM_ROOT / "pool_d_s3_recon/per_trial_metrics.jsonl",
+    ("CDCS-5 S3 reconstruction", {
+        "path": SYSTEM_ROOT / "cdcs5_s3_recon/per_trial_metrics.jsonl",
         "pool": "all five", "kind": "codec_control",
     }),
-    ("Original Q-Full UD", {
+    ("Qwen-TSE UD (Primary evidence)", {
         "path": ROOT / "grounding/csg_lambda_0/per_trial_metrics.jsonl",
         "pool": "full", "kind": "generative",
     }),
-    ("Original Q-Full + CSG", {
+    ("Qwen-TSE fixed CSG (Primary evidence)", {
         "path": ROOT / "grounding/csg_lambda_1/per_trial_metrics.jsonl",
         "pool": "full", "kind": "generative",
     }),
-    ("Pool B Selected -> Q-Full UD", {
-        "path": SYSTEM_ROOT / "pool_b_qfull_ud/per_trial_metrics.jsonl",
+    ("Qwen-TSE UD (CDCS-2 evidence)", {
+        "path": SYSTEM_ROOT / "qwen_tse_ud_cdcs2/per_trial_metrics.jsonl",
         "pool": "full+tfmap_context_full", "kind": "generative",
     }),
-    ("Pool B Selected -> Q-Full + CSG", {
-        "path": SYSTEM_ROOT / "pool_b_qfull_csg/per_trial_metrics.jsonl",
+    ("Qwen-TSE fixed CSG (CDCS-2 evidence)", {
+        "path": SYSTEM_ROOT / "qwen_tse_fixed_csg_cdcs2/per_trial_metrics.jsonl",
         "pool": "full+tfmap_context_full", "kind": "generative",
     }),
-    ("Pool D Selected -> Q-Full UD", {
-        "path": SYSTEM_ROOT / "pool_d_qfull_ud/per_trial_metrics.jsonl",
+    ("Qwen-TSE UD (CDCS-5 evidence)", {
+        "path": SYSTEM_ROOT / "qwen_tse_ud_cdcs5/per_trial_metrics.jsonl",
         "pool": "all five", "kind": "generative",
     }),
-    ("Pool D Selected -> Q-Full + CSG", {
-        "path": SYSTEM_ROOT / "pool_d_qfull_csg/per_trial_metrics.jsonl",
+    ("Qwen-TSE fixed CSG (CDCS-5 evidence)", {
+        "path": SYSTEM_ROOT / "qwen_tse_fixed_csg_cdcs5/per_trial_metrics.jsonl",
         "pool": "all five", "kind": "generative",
     }),
 ])
@@ -75,19 +75,19 @@ COHORTS = OrderedDict([
 
 COMPARISONS = OrderedDict([
     ("A", (
-        "Pool D Selected Candidate", "Pool D Selected -> Q-Full UD",
+        "CDCS-5 direct", "Qwen-TSE UD (CDCS-5 evidence)",
         "Does Qwen generation add value beyond selected deterministic evidence?",
     )),
     ("B", (
-        "Pool D Selected -> Q-Full UD", "Pool D Selected -> Q-Full + CSG",
+        "Qwen-TSE UD (CDCS-5 evidence)", "Qwen-TSE fixed CSG (CDCS-5 evidence)",
         "Does CSG add value on selected evidence?",
     )),
     ("C", (
-        "Original Q-Full + CSG", "Pool D Selected -> Q-Full + CSG",
+        "Qwen-TSE fixed CSG (Primary evidence)", "Qwen-TSE fixed CSG (CDCS-5 evidence)",
         "Does candidate correction improve the final generative system?",
     )),
     ("D", (
-        "Pool B Selected -> Q-Full + CSG", "Pool D Selected -> Q-Full + CSG",
+        "Qwen-TSE fixed CSG (CDCS-2 evidence)", "Qwen-TSE fixed CSG (CDCS-5 evidence)",
         "Are the three segmented enrollment views worth their cost?",
     )),
 ])
@@ -183,8 +183,8 @@ def enrich_deterministic(
 ) -> None:
     mapping = {
         "Primary WeSep": lambda trial_id: "full",
-        "Pool B Selected Candidate": lambda trial_id: selections[trial_id]["selected"]["pool_b"],
-        "Pool D Selected Candidate": lambda trial_id: selections[trial_id]["selected"]["pool_d"],
+        "CDCS-2 direct": lambda trial_id: selections[trial_id]["selected"]["cdcs2"],
+        "CDCS-5 direct": lambda trial_id: selections[trial_id]["selected"]["cdcs5"],
     }
     for system_name, chooser in mapping.items():
         for trial_id, row in systems[system_name].items():
@@ -531,7 +531,7 @@ def phase_peak_vram(system_slug: str) -> int:
     return peak
 
 
-def qfull_cost(slug: str, pool: str, candidate_rtf: float) -> tuple[float, float]:
+def qwen_tse_cost(slug: str, pool: str, candidate_rtf: float) -> tuple[float, float]:
     token_rows = read_jsonl(SYSTEM_ROOT / f"{slug}/per_trial_tokens.jsonl")
     audio_rows = read_jsonl(SYSTEM_ROOT / f"{slug}/audio_metrics.jsonl")
     manifest = {row["trial_id"]: row for row in read_jsonl(
@@ -548,13 +548,13 @@ def qfull_cost(slug: str, pool: str, candidate_rtf: float) -> tuple[float, float
             sf.info(manifest[row["trial_id"]]["mixture_wav"]).frames / 16000
             for row in token_rows
         )
-    qfull_seconds = sum(float(row["decode_seconds"]) for row in token_rows)
+    qwen_tse_seconds = sum(float(row["decode_seconds"]) for row in token_rows)
     synth_seconds = sum(float(row.get("synthesis_seconds", 0.0)) for row in audio_rows)
     peak = max(
         [int(row.get("cuda_reserved_bytes", 0)) for row in token_rows]
         + [phase_peak_vram(f"selected_audio_{slug}")]
     )
-    return candidate_rtf + (qfull_seconds + synth_seconds) / audio_seconds, peak / 1024 ** 3
+    return candidate_rtf + (qwen_tse_seconds + synth_seconds) / audio_seconds, peak / 1024 ** 3
 
 
 def fmt_percent(value: float | None, digits: int = 2) -> str:
@@ -582,47 +582,47 @@ def build_cost_table(
     selector = cost["selection"]
     generation_rtf = {
         "primary": float(components["full"]["candidate_generation_rtf"]),
-        "pool_b": float(components["full"]["candidate_generation_rtf"])
+        "cdcs2": float(components["full"]["candidate_generation_rtf"])
         + float(components["tfmap"]["candidate_generation_rtf"]),
-        "pool_d": float(components["full"]["candidate_generation_rtf"])
+        "cdcs5": float(components["full"]["candidate_generation_rtf"])
         + float(components["segments"]["candidate_generation_rtf"])
         + float(components["tfmap"]["candidate_generation_rtf"]),
     }
-    selection_rtf = {"primary": 0.0, "pool_b": 0.0, "pool_d": 0.0}
+    selection_rtf = {"primary": 0.0, "cdcs2": 0.0, "cdcs5": 0.0}
     selection_note = "selector cost unavailable; reported RTF is a lower bound"
     if selector is not None:
         selection_rtf.update({
-            "primary": float(selector["pools"]["Pool A"]["candidate_selection_rtf"]),
-            "pool_b": float(selector["pools"]["Pool B"]["candidate_selection_rtf"]),
-            "pool_d": float(selector["pools"]["Pool D"]["candidate_selection_rtf"]),
+            "primary": float(selector["pools"]["Primary-only"]["candidate_selection_rtf"]),
+            "cdcs2": float(selector["pools"]["CDCS-2"]["candidate_selection_rtf"]),
+            "cdcs5": float(selector["pools"]["CDCS-5"]["candidate_selection_rtf"]),
         })
-        selection_note = "candidate generation + enrollment-cosine selection; generative rows also include Q-Full and synthesis"
+        selection_note = "candidate generation + enrollment-cosine selection; generative rows also include Qwen-TSE and synthesis"
     direct_rtf = {
         key: generation_rtf[key] + selection_rtf[key] for key in generation_rtf
     }
     candidate_peak = {
         "primary": components["full"]["peak_torch_cuda_reserved_bytes"] / 1024 ** 3,
-        "pool_b": max(
+        "cdcs2": max(
             components["full"]["peak_torch_cuda_reserved_bytes"],
             components["tfmap"]["peak_torch_cuda_reserved_bytes"],
         ) / 1024 ** 3,
-        "pool_d": max(
+        "cdcs5": max(
             components["full"]["peak_torch_cuda_reserved_bytes"],
             components["segments"]["peak_torch_cuda_reserved_bytes"],
             components["tfmap"]["peak_torch_cuda_reserved_bytes"],
         ) / 1024 ** 3,
     }
-    b_rtf, b_peak = qfull_cost("pool_b_qfull_csg", "pool_b", direct_rtf["pool_b"])
-    d_rtf, d_peak = qfull_cost("pool_d_qfull_csg", "pool_d", direct_rtf["pool_d"])
+    b_rtf, b_peak = qwen_tse_cost("qwen_tse_fixed_csg_cdcs2", "cdcs2", direct_rtf["cdcs2"])
+    d_rtf, d_peak = qwen_tse_cost("qwen_tse_fixed_csg_cdcs5", "cdcs5", direct_rtf["cdcs5"])
     definitions = [
         ("Primary only", 1, 0, 0, direct_rtf["primary"], candidate_peak["primary"], "Primary WeSep"),
-        ("Pool B deterministic", 2, 0, 0, direct_rtf["pool_b"], candidate_peak["pool_b"], "Pool B Selected Candidate"),
-        ("Pool D deterministic", 5, 0, 0, direct_rtf["pool_d"], candidate_peak["pool_d"], "Pool D Selected Candidate"),
-        ("Pool B + Q-Full CSG", 2, 1, 1, b_rtf, max(candidate_peak["pool_b"], b_peak), "Pool B Selected -> Q-Full + CSG"),
-        ("Pool D + Q-Full CSG", 5, 1, 1, d_rtf, max(candidate_peak["pool_d"], d_peak), "Pool D Selected -> Q-Full + CSG"),
+        ("CDCS-2 deterministic", 2, 0, 0, direct_rtf["cdcs2"], candidate_peak["cdcs2"], "CDCS-2 direct"),
+        ("CDCS-5 deterministic", 5, 0, 0, direct_rtf["cdcs5"], candidate_peak["cdcs5"], "CDCS-5 direct"),
+        ("CDCS-2 + Qwen-TSE CSG", 2, 1, 1, b_rtf, max(candidate_peak["cdcs2"], b_peak), "Qwen-TSE fixed CSG (CDCS-2 evidence)"),
+        ("CDCS-5 + Qwen-TSE CSG", 5, 1, 1, d_rtf, max(candidate_peak["cdcs5"], d_peak), "Qwen-TSE fixed CSG (CDCS-5 evidence)"),
     ]
     rows = []
-    for label, passes, qfull, csg, rtf, peak, system in definitions:
+    for label, passes, qwen_tse, csg, rtf, peak, system in definitions:
         swap = summaries[system]["natural_primary_swap"]
         recovery = (
             swap.get("candidate_target_correct_rate")
@@ -631,7 +631,7 @@ def build_cost_table(
         )
         rows.append({
             "system": label, "extractor_passes": passes,
-            "qfull_pass": qfull, "csg": csg, "rtf": rtf,
+            "qwen_tse_pass": qwen_tse, "csg": csg, "rtf": rtf,
             "peak_vram_gib": peak,
             "target_wer": summaries[system]["full_dev"]["target_wer"],
             "swap_recovery": recovery,
@@ -644,9 +644,9 @@ def choose_system(
 ) -> str:
     eligible = []
     candidates = (
-        "Pool B Selected Candidate", "Pool D Selected Candidate",
-        "Pool B Selected -> Q-Full UD", "Pool B Selected -> Q-Full + CSG",
-        "Pool D Selected -> Q-Full UD", "Pool D Selected -> Q-Full + CSG",
+        "CDCS-2 direct", "CDCS-5 direct",
+        "Qwen-TSE UD (CDCS-2 evidence)", "Qwen-TSE fixed CSG (CDCS-2 evidence)",
+        "Qwen-TSE UD (CDCS-5 evidence)", "Qwen-TSE fixed CSG (CDCS-5 evidence)",
     )
     for name in candidates:
         full = summaries[name]["full_dev"]
@@ -658,13 +658,13 @@ def choose_system(
         ):
             eligible.append(name)
     if not eligible:
-        return "Pool B Selected Candidate"
+        return "CDCS-2 direct"
     best = min(eligible, key=lambda name: (
         summaries[name]["full_dev"]["target_wer"],
         summaries[name]["full_dev"]["content_switch_rate"],
     ))
-    if best.startswith("Pool D"):
-        counterpart = best.replace("Pool D", "Pool B", 1)
+    if "CDCS-5" in best:
+        counterpart = best.replace("CDCS-5", "CDCS-2", 1)
         if counterpart in eligible:
             b = summaries[counterpart]["full_dev"]
             d = summaries[best]["full_dev"]
@@ -673,12 +673,12 @@ def choose_system(
                 and b["content_switch_rate"] <= d["content_switch_rate"] + 0.002
             ):
                 best = counterpart
-    if qwen == "NO" and "Q-Full" in best:
-        direct = "Pool D Selected Candidate" if best.startswith("Pool D") else "Pool B Selected Candidate"
+    if qwen == "NO" and "Qwen-TSE" in best:
+        direct = "CDCS-5 direct" if "CDCS-5" in best else "CDCS-2 direct"
         if direct in eligible:
             best = direct
-    if csg == "NO" and "+ CSG" in best:
-        ud = best.replace(" + CSG", " UD")
+    if csg == "NO" and "fixed CSG" in best:
+        ud = best.replace("fixed CSG", "UD")
         if ud in eligible:
             best = ud
     return best
@@ -735,22 +735,22 @@ def build_report(
                 f"{row['p_value']:.4g}",
             ])
     cost_md = [[
-        row["system"], str(row["extractor_passes"]), str(row["qfull_pass"]),
+        row["system"], str(row["extractor_passes"]), str(row["qwen_tse_pass"]),
         str(row["csg"]), f"{row['rtf']:.3f}", f"{row['peak_vram_gib']:.2f}",
         fmt_percent(row["target_wer"]), fmt_percent(row["swap_recovery"]),
     ] for row in cost_rows]
-    pool_b = summaries["Pool B Selected Candidate"]["natural_primary_swap"]
-    pool_d = summaries["Pool D Selected Candidate"]["natural_primary_swap"]
+    cdcs2 = summaries["CDCS-2 direct"]["natural_primary_swap"]
+    cdcs5 = summaries["CDCS-5 direct"]["natural_primary_swap"]
     primary = summaries["Primary WeSep"]["full_dev"]
-    d_csg = summaries["Pool D Selected -> Q-Full + CSG"]["full_dev"]
+    d_csg = summaries["Qwen-TSE fixed CSG (CDCS-5 evidence)"]["full_dev"]
     lines = [
         "# Selected-Evidence ICASSP 2027 Final Table Report",
         "",
         "## Technical summary",
         "",
-        f"The frozen candidate selector recovers {fmt_percent(pool_b['candidate_target_correct_rate'])} "
-        f"of the 405 primary swaps with Pool B and {fmt_percent(pool_d['candidate_target_correct_rate'])} "
-        "with Pool D. The following full-system results determine whether Q-Full and CSG add value after that correction.",
+        f"The frozen candidate selector recovers {fmt_percent(cdcs2['candidate_target_correct_rate'])} "
+        f"of the 405 primary swaps with CDCS-2 and {fmt_percent(cdcs5['candidate_target_correct_rate'])} "
+        "with CDCS-5. The following full-system results determine whether Qwen-TSE and CSG add value after that correction.",
         "",
         f"- `QWEN_ADDITIONAL_VALUE = {qwen}`",
         f"- `CSG_ADDITIONAL_VALUE = {csg}`",
@@ -799,14 +799,14 @@ def build_report(
         f"RTF scope: {cost_note}. Extractor passes count candidate-equivalent outputs; the three segmented views may be batched in one model call but still produce three candidates.",
         "",
         markdown_table(
-            ["System", "Extractor Passes", "Q-Full Pass", "CSG", "RTF ↓", "Peak VRAM GiB ↓", "Target WER ↓", "Swap Recovery ↑"],
+            ["System", "Extractor Passes", "Qwen-TSE Pass", "CSG", "RTF ↓", "Peak VRAM GiB ↓", "Target WER ↓", "Swap Recovery ↑"],
             cost_md,
         ),
         "",
         "## Scope and metric definitions",
         "",
         "- DEV contains 6,000 trials: 405 frozen high-confidence primary swaps, 5,586 primary-correct controls, and nine ambiguous cases.",
-        "- Selection is the frozen enrollment-only ECAPA cosine argmax. Pool B is `full + tfmap_context_full`; Pool D contains all five frozen candidates.",
+        "- Selection is the frozen enrollment-only ECAPA cosine argmax. CDCS-2 is `full + tfmap_context_full`; CDCS-5 contains all five frozen candidates.",
         "- Target WER and content switch use the same Whisper-small.en greedy ASR-consistency protocol. Acoustic switch and speaker margin use the same CosyVoice/CAMPPlus evaluation backend across all table systems.",
         "- Speaker recovery requires acoustic speaker margin above zero. Content recovery requires no content switch, target WER below 50%, and a nonempty, non-short output. Joint recovery requires both.",
         "- Deterministic SI-SDR and target-correct rates remain auxiliary candidate diagnostics; generative SI-SDR sign is not used as the primary identity decision.",
@@ -814,7 +814,7 @@ def build_report(
         "",
         "## Direct answers for the paper",
         "",
-        f"1. **Is alternative candidate selection sufficient?** Pool B and Pool D candidate recovery are {fmt_percent(pool_b['candidate_target_correct_rate'])} and {fmt_percent(pool_d['candidate_target_correct_rate'])}, with the corresponding control regression visible in Table 3. Selection is the dominant first correction step, but residual failures remain.",
+        f"1. **Is alternative candidate selection sufficient?** CDCS-2 and CDCS-5 candidate recovery are {fmt_percent(cdcs2['candidate_target_correct_rate'])} and {fmt_percent(cdcs5['candidate_target_correct_rate'])}, with the corresponding control regression visible in Table 3. Selection is the dominant first correction step, but residual failures remain.",
         f"2. **Does Qwen improve the selected candidate?** `{qwen}` under the frozen paired decision rule.",
         f"3. **Does CSG still improve selected evidence?** `{csg}` for lambda 1 versus matching selected-evidence UD.",
         f"4. **Where does the contribution come from?** The evidence supports the combination stated by the Qwen/CSG verdicts above; candidate diversity plus speaker-consistent selection is the prerequisite contribution and any claimed refinement benefit is limited to statistically supported paired changes.",
@@ -825,7 +825,7 @@ def build_report(
         "",
         "## Recommended next step",
         "",
-        f"Use **{recommended}** as the frozen DEV recommendation. Do not tune candidate definitions, selector weights, Q-Full checkpoint, CSG lambda, metrics, or failure policy from these results. Preserve natural TEST for a separately authorized final evaluation.",
+        f"Use **{recommended}** as the frozen DEV recommendation. Do not tune candidate definitions, selector weights, Qwen-TSE checkpoint, CSG lambda, metrics, or failure policy from these results. Preserve natural TEST for a separately authorized final evaluation.",
         "",
         "## Further question",
         "",
@@ -858,18 +858,18 @@ def main() -> int:
                 "duplicate": 0, "failed": 0, **summary,
             })
 
-    pool_b_swap = summaries["Pool B Selected Candidate"]["natural_primary_swap"]
-    pool_d_swap = summaries["Pool D Selected Candidate"]["natural_primary_swap"]
-    pool_b_control = summaries["Pool B Selected Candidate"]["primary_correct_control"]
-    pool_d_control = summaries["Pool D Selected Candidate"]["primary_correct_control"]
+    cdcs2_swap = summaries["CDCS-2 direct"]["natural_primary_swap"]
+    cdcs5_swap = summaries["CDCS-5 direct"]["natural_primary_swap"]
+    cdcs2_control = summaries["CDCS-2 direct"]["primary_correct_control"]
+    cdcs5_control = summaries["CDCS-5 direct"]["primary_correct_control"]
     expected_b = 337 / 405
     expected_d = 355 / 405
     expected_control = 2 / 5586
     if not (
-        math.isclose(pool_b_swap["candidate_target_correct_rate"], expected_b, abs_tol=1e-15)
-        and math.isclose(pool_d_swap["candidate_target_correct_rate"], expected_d, abs_tol=1e-15)
-        and math.isclose(pool_b_control["candidate_target_correct_rate"], 1 - expected_control, abs_tol=1e-15)
-        and math.isclose(pool_d_control["candidate_target_correct_rate"], 1 - expected_control, abs_tol=1e-15)
+        math.isclose(cdcs2_swap["candidate_target_correct_rate"], expected_b, abs_tol=1e-15)
+        and math.isclose(cdcs5_swap["candidate_target_correct_rate"], expected_d, abs_tol=1e-15)
+        and math.isclose(cdcs2_control["candidate_target_correct_rate"], 1 - expected_control, abs_tol=1e-15)
+        and math.isclose(cdcs5_control["candidate_target_correct_rate"], 1 - expected_control, abs_tol=1e-15)
     ):
         raise ValueError("STOP: frozen candidate recovery/control audit changed")
 
@@ -903,7 +903,7 @@ def main() -> int:
         writer.writeheader()
         writer.writerows(cost_rows)
     recommended = choose_system(summaries, qwen, csg)
-    direct_d = summaries["Pool D Selected Candidate"]["full_dev"]
+    direct_d = summaries["CDCS-5 direct"]["full_dev"]
     best = summaries[recommended]["full_dev"]
     no_go = (
         best["target_wer"] - direct_d["target_wer"] >= 0.10
@@ -937,7 +937,7 @@ def main() -> int:
 The frozen 6,000-trial DEV analysis gives `QWEN_ADDITIONAL_VALUE = {qwen}` and
 `CSG_ADDITIONAL_VALUE = {csg}`. The recommended frozen system is
 **{recommended}**. Candidate selection recovers {100 * expected_b:.2f}% of
-primary swaps with Pool B and {100 * expected_d:.2f}% with Pool D while the
+primary swaps with CDCS-2 and {100 * expected_d:.2f}% with CDCS-5 while the
 candidate target-correct regression rate on 5,586 controls is
 {100 * expected_control:.4f}% for both pools.
 
@@ -947,45 +947,45 @@ candidate-pool, checkpoint, CSG-lambda, metric, or failure-policy tuning.
 `TEST_USED = NO`
 """
     atomic_text(ROOT / "docs/ICASSP2027_SELECTED_EVIDENCE_VERDICT.md", verdict_text)
-    cost_text = "# Candidate Pool Cost Report\n\n" + markdown_table(
-        ["System", "Extractor Passes", "Q-Full Pass", "CSG", "RTF", "Peak VRAM GiB", "Target WER", "Swap Recovery"],
+    cost_text = "# Candidate WeSep Cost Report\n\n" + markdown_table(
+        ["System", "Extractor Passes", "Qwen-TSE Pass", "CSG", "RTF", "Peak VRAM GiB", "Target WER", "Swap Recovery"],
         [[
-            row["system"], str(row["extractor_passes"]), str(row["qfull_pass"]),
+            row["system"], str(row["extractor_passes"]), str(row["qwen_tse_pass"]),
             str(row["csg"]), f"{row['rtf']:.3f}", f"{row['peak_vram_gib']:.2f}",
             fmt_percent(row["target_wer"]), fmt_percent(row["swap_recovery"]),
         ] for row in cost_rows],
     ) + f"\n\n{cost_note}. `TEST_USED = NO`.\n"
-    atomic_text(ROOT / "docs/CANDIDATE_POOL_COST_REPORT.md", cost_text)
+    atomic_text(ROOT / "docs/CANDIDATE_WESEP_COST_REPORT.md", cost_text)
     audit = {
         "status": "PASS", "expected": EXPECTED, "unique": EXPECTED,
         "missing": 0, "duplicate": 0, "failed": 0,
         "cohorts": {"full_dev": 6000, "natural_primary_swap": 405,
                     "primary_correct_control": 5586, "ambiguous_primary_wrong": 9},
         "candidate_order": ["full", "first", "middle", "final", "tfmap_context_full"],
-        "pool_b_swap_recovery": expected_b,
-        "pool_d_swap_recovery": expected_d,
-        "pool_b_control_regression": expected_control,
-        "pool_d_control_regression": expected_control,
-        "qfull_checkpoint_epoch": 4, "qfull_checkpoint_step": 13900,
+        "cdcs2_swap_recovery": expected_b,
+        "cdcs5_swap_recovery": expected_d,
+        "cdcs2_control_regression": expected_control,
+        "cdcs5_control_regression": expected_control,
+        "qwen_tse_checkpoint_epoch": 4, "qwen_tse_checkpoint_step": 13900,
         "csg_lambda": 1.0, "csg_w": 0.0, "test_used": False,
     }
     audit_text = "# Candidate Integration Audit\n\n```json\n" + json.dumps(audit, indent=2) + "\n```\n"
     atomic_text(ROOT / "docs/CANDIDATE_INTEGRATION_AUDIT.md", audit_text)
     terminal = {
         "FULL_DEV_COMPLETE": "YES",
-        "POOL_B_SWAP_RECOVERY": pool_b_swap["candidate_target_correct_rate"],
-        "POOL_D_SWAP_RECOVERY": pool_d_swap["candidate_target_correct_rate"],
+        "CDCS2_SWAP_RECOVERY": cdcs2_swap["candidate_target_correct_rate"],
+        "CDCS5_SWAP_RECOVERY": cdcs5_swap["candidate_target_correct_rate"],
         "SELECTED_DETERMINISTIC_TARGET_WER": direct_d["target_wer"],
-        "ORIGINAL_QFULL_CSG_TARGET_WER": summaries["Original Q-Full + CSG"]["full_dev"]["target_wer"],
-        "POOL_B_QFULL_UD_TARGET_WER": summaries["Pool B Selected -> Q-Full UD"]["full_dev"]["target_wer"],
-        "POOL_B_QFULL_CSG_TARGET_WER": summaries["Pool B Selected -> Q-Full + CSG"]["full_dev"]["target_wer"],
-        "POOL_D_QFULL_UD_TARGET_WER": summaries["Pool D Selected -> Q-Full UD"]["full_dev"]["target_wer"],
-        "POOL_D_QFULL_CSG_TARGET_WER": summaries["Pool D Selected -> Q-Full + CSG"]["full_dev"]["target_wer"],
-        "POOL_D_SELECTED_CONTENT_SWITCH": direct_d["content_switch_rate"],
-        "POOL_D_QFULL_CSG_CONTENT_SWITCH": summaries["Pool D Selected -> Q-Full + CSG"]["full_dev"]["content_switch_rate"],
-        "POOL_D_QFULL_CSG_ACOUSTIC_SWITCH": summaries["Pool D Selected -> Q-Full + CSG"]["full_dev"]["acoustic_switch_rate"],
-        "POOL_D_QFULL_CSG_SPEAKER_MARGIN": summaries["Pool D Selected -> Q-Full + CSG"]["full_dev"]["speaker_margin"],
-        "POOL_D_QFULL_CSG_DNSMOS": summaries["Pool D Selected -> Q-Full + CSG"]["full_dev"]["dnsmos_p808"],
+        "QWEN_TSE_FIXED_CSG_PRIMARY_TARGET_WER": summaries["Qwen-TSE fixed CSG (Primary evidence)"]["full_dev"]["target_wer"],
+        "QWEN_TSE_UD_CDCS2_TARGET_WER": summaries["Qwen-TSE UD (CDCS-2 evidence)"]["full_dev"]["target_wer"],
+        "QWEN_TSE_FIXED_CSG_CDCS2_TARGET_WER": summaries["Qwen-TSE fixed CSG (CDCS-2 evidence)"]["full_dev"]["target_wer"],
+        "QWEN_TSE_UD_CDCS5_TARGET_WER": summaries["Qwen-TSE UD (CDCS-5 evidence)"]["full_dev"]["target_wer"],
+        "QWEN_TSE_FIXED_CSG_CDCS5_TARGET_WER": summaries["Qwen-TSE fixed CSG (CDCS-5 evidence)"]["full_dev"]["target_wer"],
+        "CDCS5_DIRECT_CONTENT_SWITCH": direct_d["content_switch_rate"],
+        "QWEN_TSE_FIXED_CSG_CDCS5_CONTENT_SWITCH": summaries["Qwen-TSE fixed CSG (CDCS-5 evidence)"]["full_dev"]["content_switch_rate"],
+        "QWEN_TSE_FIXED_CSG_CDCS5_ACOUSTIC_SWITCH": summaries["Qwen-TSE fixed CSG (CDCS-5 evidence)"]["full_dev"]["acoustic_switch_rate"],
+        "QWEN_TSE_FIXED_CSG_CDCS5_SPEAKER_MARGIN": summaries["Qwen-TSE fixed CSG (CDCS-5 evidence)"]["full_dev"]["speaker_margin"],
+        "QWEN_TSE_FIXED_CSG_CDCS5_DNSMOS": summaries["Qwen-TSE fixed CSG (CDCS-5 evidence)"]["full_dev"]["dnsmos_p808"],
         "QWEN_ADDITIONAL_VALUE": qwen,
         "CSG_ADDITIONAL_VALUE": csg,
         "RECOMMENDED_FINAL_SYSTEM": recommended,

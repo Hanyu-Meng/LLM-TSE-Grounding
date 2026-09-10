@@ -74,7 +74,7 @@
 			<text x="640" y="237" style="font-family: Helvetica; font-size: 10.7px;fill: rgb(29%,33%,38%); stroke:none;" transform="translate(0,474) scale(1,-1)">WER 53.50%</text>
 			<path d="M 467.78381,197.72973 L 512,210 Z" style="stroke: rgb(61%,63%,68%); stroke-linecap: butt; stroke-width: 0.8;"/>
 			<rect x="350" y="202" width="162" height="54" rx="5" ry="5" style="stroke: rgb(81%,83%,85%); stroke-linecap: butt; stroke-width: 0.75; fill: rgb(100%,100%,100%); fill-rule: evenodd; fill-opacity: 0.98;"/>
-			<text x="360" y="235" style="font-family: Helvetica; font-size: 11.8px;fill: rgb(6%,9%,15%); stroke:none;" transform="translate(0,470) scale(1,-1)">Pool-D direct</text>
+			<text x="360" y="235" style="font-family: Helvetica; font-size: 11.8px;fill: rgb(6%,9%,15%); stroke:none;" transform="translate(0,470) scale(1,-1)">CDCS-5 direct</text>
 			<text x="360" y="214" style="font-family: Helvetica; font-size: 10.7px;fill: rgb(29%,33%,38%); stroke:none;" transform="translate(0,428) scale(1,-1)">WER 46.75%</text>
 			<rect x="122.94285714285715" y="493.6756756756757" width="80.79523809523809" height="48.6486486486487" style="stroke: rgb(41%,44%,50%); stroke-linecap: butt; stroke-width: 1; fill: none; fill-rule: evenodd; stroke-dasharray: 4, 3;"/>
 			<text x="211.73809523809524" y="537.3243243243244" style="font-family: Helvetica; font-size: 11px;fill: rgb(29%,33%,38%); stroke:none;" transform="translate(0,1074) scale(1,-1)">zoom →</text>
@@ -87,7 +87,7 @@
 			<polygon points="1037.571 437.55, 1050.221 424.9, 1037.571 412.25, 1024.921 424.9" style="stroke: rgb(100%,100%,100%); stroke-linecap: butt; stroke-width: 1.5; fill: rgb(94%,75%,47%); fill-rule: evenodd;"/>
 			<path d="M 1333,516.325 L 1278,516.325 Z" style="stroke: rgb(61%,63%,68%); stroke-linecap: butt; stroke-width: 0.8;"/>
 			<rect x="1130" y="505" width="148" height="54" rx="5" ry="5" style="stroke: rgb(81%,83%,85%); stroke-linecap: butt; stroke-width: 0.75; fill: rgb(100%,100%,100%); fill-rule: evenodd; fill-opacity: 0.98;"/>
-			<text x="1140" y="538" style="font-family: Helvetica; font-size: 11.8px;fill: rgb(6%,9%,15%); stroke:none;" transform="translate(0,1076) scale(1,-1)">Q-Full UD</text>
+			<text x="1140" y="538" style="font-family: Helvetica; font-size: 11.8px;fill: rgb(6%,9%,15%); stroke:none;" transform="translate(0,1076) scale(1,-1)">Qwen-TSE UD</text>
 			<text x="1140" y="517" style="font-family: Helvetica; font-size: 10.7px;fill: rgb(29%,33%,38%); stroke:none;" transform="translate(0,1034) scale(1,-1)">WER 66.87%</text>
 			<path d="M 948.047619,283.7875 L 972,283.7875 Z" style="stroke: rgb(61%,63%,68%); stroke-linecap: butt; stroke-width: 0.8;"/>
 			<rect x="972" y="257" width="148" height="54" rx="5" ry="5" style="stroke: rgb(60%,30%,0%); stroke-linecap: butt; stroke-width: 1.4; fill: rgb(100%,100%,100%); fill-rule: evenodd; fill-opacity: 0.98;"/>
@@ -99,7 +99,7 @@
 			<text x="1065" y="366" style="font-family: Helvetica; font-size: 10.7px;fill: rgb(29%,33%,38%); stroke:none;" transform="translate(0,732) scale(1,-1)">WER 62.92%</text>
 			<path d="M 1037.571429,424.9 L 1062,439 Z" style="stroke: rgb(61%,63%,68%); stroke-linecap: butt; stroke-width: 0.8;"/>
 			<rect x="1062" y="431" width="150" height="54" rx="5" ry="5" style="stroke: rgb(81%,83%,85%); stroke-linecap: butt; stroke-width: 0.75; fill: rgb(100%,100%,100%); fill-rule: evenodd; fill-opacity: 0.98;"/>
-			<text x="1072" y="464" style="font-family: Helvetica; font-size: 11.8px;fill: rgb(6%,9%,15%); stroke:none;" transform="translate(0,928) scale(1,-1)">GNR K20/R2</text>
+			<text x="1072" y="464" style="font-family: Helvetica; font-size: 11.8px;fill: rgb(6%,9%,15%); stroke:none;" transform="translate(0,928) scale(1,-1)">Qwen-TSE adaptive CSG+GNR</text>
 			<text x="1072" y="443" style="font-family: Helvetica; font-size: 10.7px;fill: rgb(29%,33%,38%); stroke:none;" transform="translate(0,886) scale(1,-1)">WER 65.96%</text>
 			<text x="289.121" y="116" style="font-family: Helvetica; font-size: 14.5px;fill: rgb(12%,16%,21%); stroke:none;" transform="translate(0,232) scale(1,-1)">Acoustic speaker-switch rate (%)  ← lower is better</text>
 			<text x="1046.72675" y="195" style="font-family: Helvetica; font-size: 13.5px;fill: rgb(12%,16%,21%); stroke:none;" transform="translate(0,390) scale(1,-1)">Acoustic speaker-switch rate (%)</text>
@@ -110,7 +110,7 @@
 			<text x="260" y="72" style="font-family: Helvetica; font-size: 11.5px;fill: rgb(21%,25%,31%); stroke:none;" transform="translate(0,144) scale(1,-1)">LLM generative arm</text>
 			<polygon points="417 83, 424 76, 417 69, 410 76" style="stroke: rgb(36%,17%,0%); stroke-linecap: butt; stroke-width: 1.6; fill: rgb(60%,30%,0%); fill-rule: evenodd;"/>
 			<text x="432" y="72" style="font-family: Helvetica; font-size: 11.5px;fill: rgb(21%,25%,31%); stroke:none;" transform="translate(0,144) scale(1,-1)">Frozen best generative arm</text>
-			<text x="76" y="36" style="font-family: Helvetica; font-size: 10.8px;fill: rgb(21%,25%,31%); stroke:none;" transform="translate(0,72) scale(1,-1)">Pool-D is the fidelity-oriented operating point; fixed CSG gives the lowest generative acoustic-switch rate.</text>
+			<text x="76" y="36" style="font-family: Helvetica; font-size: 10.8px;fill: rgb(21%,25%,31%); stroke:none;" transform="translate(0,72) scale(1,-1)">CDCS-5 is the fidelity-oriented operating point; fixed CSG gives the lowest generative acoustic-switch rate.</text>
 			<text x="76" y="20" style="font-family: Helvetica; font-size: 10.8px;fill: rgb(21%,25%,31%); stroke:none;" transform="translate(0,40) scale(1,-1)">Adaptive CSG and GNR recover slight predicted quality but do not improve reliability. Panel (b) uses focused axes.</text>
 		</g>
 	</g>

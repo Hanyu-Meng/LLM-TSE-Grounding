@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Leak-free Q-Full UD/CSG decoding from frozen selected evidence."""
+"""Leak-free Qwen-TSE UD/CSG decoding from frozen selected evidence."""
 
 from __future__ import annotations
 
@@ -41,10 +41,10 @@ EXPECTED_CHECKPOINT_SHA256 = "34cf1f1cfb73c5c7d4d0fb51a380e90acf160c7a5a13cd5c50
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, required=True)
-    parser.add_argument("--pool", choices=("pool_full", "pool_b", "pool_d"), required=True)
+    parser.add_argument("--pool", choices=("primary", "cdcs2", "cdcs5"), required=True)
     parser.add_argument(
         "--checkpoint", type=Path,
-        default=ROOT / "experiments/qfull_sme_rawqwen_seed0_20260810_0858/checkpoints/best.pt",
+        default=ROOT / "experiments/qwen_tse_sme_rawqwen_seed0_20260810_0858/checkpoints/best.pt",
     )
     parser.add_argument("--qwen", type=Path, default=ROOT / "pretrained/Qwen2.5-0.5B-Instruct")
     parser.add_argument("--wavlm", type=Path, default=ROOT / "pretrained/wavlm-base-plus")
@@ -255,7 +255,7 @@ def main() -> int:
     if args.mode == "csg" and args.csg_lambda < 0.0:
         raise ValueError("CSG lambda must be nonnegative")
     if sha256(args.checkpoint) != EXPECTED_CHECKPOINT_SHA256:
-        raise ValueError("frozen Q-Full checkpoint SHA-256 mismatch")
+        raise ValueError("frozen Qwen-TSE checkpoint SHA-256 mismatch")
     random.seed(args.seed)
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
@@ -273,7 +273,7 @@ def main() -> int:
     failures_path = args.output_dir / "failures.jsonl"
     guard_log = args.guard_log
     guard_log.parent.mkdir(parents=True, exist_ok=True)
-    phase = f"selected_{args.pool}_qfull_{args.mode}"
+    phase = f"selected_{args.pool}_qwen_tse_{args.mode}"
 
     prior_rows: list[dict[str, Any]] = []
     for source in (progress_path, records_path):

@@ -295,13 +295,13 @@ def write_status(path: Path | None, args: argparse.Namespace,
         return
     value = lambda key, default="NOT_AVAILABLE": state.get(key, default)
     lines = [
-        "# Q-Full Raw-Qwen TSE Status",
+        "# Qwen-TSE Training Status",
         "",
-        "Experiment:", "Q-Full [S,M,E]",
+        "Experiment:", "Evidence-conditioned Qwen-TSE",
         "", "Initialization:", "Raw Qwen2.5-0.5B-Instruct",
-        "", "Screen:", os.environ.get("QFULL_SCREEN_SESSION", "NOT_AVAILABLE"),
-        "", "TensorBoard screen:", os.environ.get("QFULL_TB_SESSION", "NOT_AVAILABLE"),
-        "", "TensorBoard port:", os.environ.get("QFULL_TB_PORT", "NOT_AVAILABLE"),
+        "", "Screen:", os.environ.get("QWEN_TSE_SCREEN_SESSION", "NOT_AVAILABLE"),
+        "", "TensorBoard screen:", os.environ.get("QWEN_TSE_TB_SESSION", "NOT_AVAILABLE"),
+        "", "TensorBoard port:", os.environ.get("QWEN_TSE_TB_PORT", "NOT_AVAILABLE"),
         "", "W&B:", "DISABLED",
         "", "PID:", str(os.getpid()),
         "", "Start time:", str(value("start_time")),

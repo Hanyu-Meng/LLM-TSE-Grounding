@@ -1,6 +1,6 @@
 """Core reference operators for Repair Before Grounding."""
 
-from .candidate_selection import POOL_D, Selection, select_by_enrollment_similarity
+from .candidate_selection import CDCS5_CANDIDATES, Selection, select_by_enrollment_similarity
 from .csg import csg_penalize_logits, select_csg_tokens
 from .difficulty import residual_difficulty, source_threshold_lambda
 from .fsq import BASE, N_DIGITS, VOCAB_SIZE, digits_to_ids, hamming_distance, ids_to_digits
@@ -11,7 +11,7 @@ __all__ = [
     "BASE",
     "GNRResult",
     "N_DIGITS",
-    "POOL_D",
+    "CDCS5_CANDIDATES",
     "Selection",
     "VOCAB_SIZE",
     "csg_penalize_logits",

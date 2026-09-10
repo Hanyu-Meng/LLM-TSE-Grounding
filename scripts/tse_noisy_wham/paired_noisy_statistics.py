@@ -68,10 +68,10 @@ def main() -> int:
         ROOT / "analysis/noisy_wham/dev/full/gnr_selection.json"
     ).read_text())
     slugs = {
-        "D0": "primary_wesep", "D3": "pool_d_selected",
-        "G2": "pool_d_qfull_ud", "G3": "pool_d_fixed_csg",
-        "G5": "pool_d_adaptive_csg",
-        "G6": gnr["selected_dev_slug"] if args.split == "dev" else "pool_d_adaptive_csg_gnr",
+        "D0": "primary_wesep", "D3": "cdcs5_direct",
+        "G2": "qwen_tse_ud_cdcs5", "G3": "qwen_tse_fixed_csg_cdcs5",
+        "G5": "qwen_tse_adaptive_csg_cdcs5",
+        "G6": gnr["selected_dev_slug"] if args.split == "dev" else "qwen_tse_adaptive_csg_gnr_cdcs5",
     }
     systems = {
         code: {row["trial_id"]: row for row in read_jsonl(compiled / f"{slug}.jsonl")}

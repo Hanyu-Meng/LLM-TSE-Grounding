@@ -14,8 +14,8 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[2]
 BASE = ROOT / "analysis/selected_evidence/smoke"
 SYSTEMS = (
-    "pool_b_qfull_ud", "pool_b_qfull_csg",
-    "pool_d_qfull_ud", "pool_d_qfull_csg",
+    "qwen_tse_ud_cdcs2", "qwen_tse_fixed_csg_cdcs2",
+    "qwen_tse_ud_cdcs5", "qwen_tse_fixed_csg_cdcs5",
 )
 
 
@@ -86,7 +86,7 @@ def main() -> int:
         metric_rows = read_jsonl(directory / "per_trial_metrics.jsonl")
         if len(metric_rows) != 100 or len({row["trial_id"] for row in metric_rows}) != 100:
             raise ValueError(f"{system} final metrics are not exactly 100 unique rows")
-        checks.append(memory_check(token_rows, system, "qfull_decode"))
+        checks.append(memory_check(token_rows, system, "qwen_tse_decode"))
         checks.append(memory_check(audio_rows, system, "cosyvoice_audio"))
     result = {
         "status": "PASS",

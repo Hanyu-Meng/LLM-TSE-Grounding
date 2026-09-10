@@ -18,10 +18,10 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[2]
 SYSTEMS = {
     "D0": ("primary_wesep", "Primary WeSep"),
-    "D3": ("pool_d_selected", "Pool D direct"),
-    "G2": ("pool_d_qfull_ud", "Pool D Q-Full UD"),
-    "G3": ("pool_d_fixed_csg", "Pool D fixed CSG"),
-    "G5": ("pool_d_adaptive_csg", "Pool D adaptive CSG"),
+    "D3": ("cdcs5_direct", "CDCS-5 direct"),
+    "G2": ("qwen_tse_ud_cdcs5", "Qwen-TSE UD (CDCS-5 evidence)"),
+    "G3": ("qwen_tse_fixed_csg_cdcs5", "CDCS-5 fixed CSG"),
+    "G5": ("qwen_tse_adaptive_csg_cdcs5", "CDCS-5 adaptive CSG"),
 }
 FULL_CODES = ("D0", "D3", "G2", "G3", "G5", "G6")
 EXTENDED_METRICS = {
@@ -121,9 +121,9 @@ def system_candidate_correct(code: str, candidate: dict[str, Any], row: dict[str
     if code == "D1":
         return bool(candidate["tfmap_context_full_target_correct"])
     if code == "D2":
-        return bool(candidate["pool_b_selected_target_correct"])
+        return bool(candidate["cdcs2_direct_target_correct"])
     if code == "D3":
-        return bool(candidate["pool_d_selected_target_correct"])
+        return bool(candidate["cdcs5_direct_target_correct"])
     return float(row["speaker_margin"]) > 0.0
 
 
@@ -140,7 +140,7 @@ def main() -> int:
         args.expected,
     )
     tail = json.loads((
-        ROOT / f"analysis/noisy_wham/{split}/noisy_qfull_tail_bank.json"
+        ROOT / f"analysis/noisy_wham/{split}/noisy_qwen_tse_tail_bank.json"
     ).read_text())
     tail_ids = {
         name: set(value["trial_ids"])
@@ -151,9 +151,9 @@ def main() -> int:
     ).read_text())
     gnr_slug = (
         gnr_selection["selected_dev_slug"]
-        if split == "dev" else "pool_d_adaptive_csg_gnr"
+        if split == "dev" else "qwen_tse_adaptive_csg_gnr_cdcs5"
     )
-    systems = SYSTEMS | {"G6": (gnr_slug, "Pool D adaptive CSG + GNR-LLM")}
+    systems = SYSTEMS | {"G6": (gnr_slug, "CDCS-5 adaptive CSG + GNR-LLM")}
     codes = FULL_CODES
     compiled: dict[str, list[dict[str, Any]]] = {}
     summaries: dict[str, Any] = {}
@@ -174,7 +174,7 @@ def main() -> int:
         adaptive_anchor = {}
         if code == "G6":
             adaptive_anchor = load_keyed(
-                result_root / "pool_d_adaptive_csg/per_trial_tokens.jsonl", args.expected
+                result_root / "qwen_tse_adaptive_csg_cdcs5/per_trial_tokens.jsonl", args.expected
             )
         rows = []
         for trial_id, base in source.items():

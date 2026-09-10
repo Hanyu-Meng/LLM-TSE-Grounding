@@ -22,9 +22,9 @@ CODES = ("D0", "D3", "G2", "G3", "G5", "G6")
 GROUNDING = ("D3", "G2", "G3", "G5", "G6")
 TAIL_CODES = ("G2", "G3", "G5", "G6")
 LABELS = {
-    "D0": "Primary WeSep", "D3": "Pool D direct",
-    "G2": "Pool D → Q-Full UD", "G3": "Pool D → fixed CSG",
-    "G5": "Pool D → adaptive CSG", "G6": "Pool D → adaptive CSG → GNR-LLM",
+    "D0": "Primary WeSep", "D3": "CDCS-5 direct",
+    "G2": "Qwen-TSE UD", "G3": "Qwen-TSE fixed CSG",
+    "G5": "Qwen-TSE adaptive CSG", "G6": "Qwen-TSE adaptive CSG+GNR",
 }
 COLORS = {
     "D0": "#475569", "D3": "#0F766E", "G2": "#94A3B8",
@@ -118,9 +118,9 @@ def reliability(row: dict[str, Any]) -> float:
 def decisions(test: dict[str, Any], cand_test: dict[str, Any],
               stats: list[dict[str, Any]]) -> dict[str, str]:
     c = cand_test["natural"]
-    recovery = float(c["pool_d_selected_recovery_rate_on_primary_swaps"])
-    gap = float(c["pool_d_selector_gap_on_primary_swaps"])
-    regression = float(c["pool_d_control_regression_rate"])
+    recovery = float(c["cdcs5_direct_recovery_rate_on_primary_swaps"])
+    gap = float(c["cdcs5_selector_gap_on_primary_swaps"])
+    regression = float(c["cdcs5_control_regression_rate"])
     if recovery >= 0.50 and gap <= 0.15 and regression <= 0.01:
         pool = "STRONG"
     elif recovery >= 0.25 and regression <= 0.05:
@@ -163,7 +163,7 @@ def decisions(test: dict[str, Any], cand_test: dict[str, Any],
     material_content_loss = reliability(generative) > reliability(direct) + 0.01
     llm = "YES" if llm_quality and not material_content_loss else "MIXED" if llm_quality else "NO"
     return {
-        "NOISY_POOL_D_REPAIR": pool,
+        "NOISY_CDCS5_REPAIR": pool,
         "FIXED_CSG_CONTENT_CONTROL": fixed,
         "ADAPTIVE_CSG_VALUE": adaptive,
         "GNR_QUALITY_RECOVERY": gnr_quality,
@@ -246,14 +246,14 @@ def confusion_row(split: str, cohort: str, row: dict[str, Any],
         "Split": split, "Cohort": cohort,
         "Primary_Swap_Count": row["primary_noisy_swap_count"],
         "Primary_Swap_Rate": row["primary_noisy_swap_rate"],
-        "Pool_D_Availability": row["pool_d_oracle_recovery_rate_on_primary_swaps"],
-        "Pool_D_Oracle_Recovery": row["pool_d_oracle_recovery_rate_on_primary_swaps"],
-        "Pool_D_Cosine_Recovery": row["pool_d_selected_recovery_rate_on_primary_swaps"],
-        "Selector_Oracle_Gap": row["pool_d_selector_gap_on_primary_swaps"],
-        "TFmap_Only_Recovery": row["pool_d_tfmap_only_recovery_rate_on_primary_swaps"],
-        "Segment_Only_Recovery": row["pool_d_segment_only_recovery_rate_on_primary_swaps"],
-        "TFmap_Segment_Overlap": row["pool_d_tfmap_segment_overlap_rate_on_primary_swaps"],
-        "Control_Regression": row["pool_d_control_regression_rate"],
+        "CDCS5_Availability": row["cdcs5_oracle_recovery_rate_on_primary_swaps"],
+        "CDCS5_Oracle_Recovery": row["cdcs5_oracle_recovery_rate_on_primary_swaps"],
+        "CDCS5_Cosine_Recovery": row["cdcs5_direct_recovery_rate_on_primary_swaps"],
+        "Selector_Oracle_Gap": row["cdcs5_selector_gap_on_primary_swaps"],
+        "TFmap_Only_Recovery": row["cdcs5_tfmap_only_recovery_rate_on_primary_swaps"],
+        "Segment_Only_Recovery": row["cdcs5_segment_only_recovery_rate_on_primary_swaps"],
+        "TFmap_Segment_Overlap": row["cdcs5_tfmap_segment_overlap_rate_on_primary_swaps"],
+        "Control_Regression": row["cdcs5_control_regression_rate"],
         "Joint_Recovery": joint,
     }
 
@@ -307,8 +307,8 @@ def figures(dev: dict[str, Any], test: dict[str, Any],
         fig, ax = plt.subplots(figsize=(6.8, 4.3), constrained_layout=True)
         series = {
             "Primary swap": [cand["controlled_by_snr"][str(s)]["primary_noisy_swap_rate"] for s in SNRS],
-            "Pool D selected wrong": [1-cand["controlled_by_snr"][str(s)]["pool_d_selected_target_correct_rate"] for s in SNRS],
-            "Pool D oracle wrong": [1-cand["controlled_by_snr"][str(s)]["pool_d_oracle_availability_rate"] for s in SNRS],
+            "CDCS-5 selected wrong": [1-cand["controlled_by_snr"][str(s)]["cdcs5_direct_target_correct_rate"] for s in SNRS],
+            "CDCS-5 oracle wrong": [1-cand["controlled_by_snr"][str(s)]["cdcs5_oracle_availability_rate"] for s in SNRS],
         }
         for (label, values), color, marker in zip(series.items(),
                 ("#475569", "#0F766E", "#E76F51"), ("o", "s", "^")):
@@ -405,17 +405,17 @@ def reports(dev: dict[str, Any], test: dict[str, Any], ctest: dict[str, Any],
 
 ## Answer first
 
-The frozen noisy study completed natural and controlled-SNR DEV plus one frozen TEST run. Pool D repair is **{verdict['NOISY_POOL_D_REPAIR']}**; fixed CSG content control is **{verdict['FIXED_CSG_CONTENT_CONTROL']}**; adaptive CSG value is **{verdict['ADAPTIVE_CSG_VALUE']}**; GNR quality recovery/content preservation are **{verdict['GNR_QUALITY_RECOVERY']} / {verdict['GNR_CONTENT_PRESERVATION']}**. Post-TEST tuning: **NO**.
+The frozen noisy study completed natural and controlled-SNR DEV plus one frozen TEST run. CDCS-5 repair is **{verdict['NOISY_CDCS5_REPAIR']}**; fixed CSG content control is **{verdict['FIXED_CSG_CONTENT_CONTROL']}**; adaptive CSG value is **{verdict['ADAPTIVE_CSG_VALUE']}**; GNR quality recovery/content preservation are **{verdict['GNR_QUALITY_RECOVERY']} / {verdict['GNR_CONTENT_PRESERVATION']}**. Post-TEST tuning: **NO**.
 
 {headline}
 
 ## Data and protocol
 
-Natural DEV/TEST each contain 3,000 Libri2Mix/WHAM mixtures evaluated in both target directions (6,000 trials). Controlled DEV/TEST each add 2,400 trials at −5/0/5/10/15 dB. Enrollment remains clean. All candidate construction, Q-Full, fixed CSG, adaptive mapping, GNR K/R, model hashes, and metric code were frozen before noisy TEST. TEST was executed once.
+Natural DEV/TEST each contain 3,000 Libri2Mix/WHAM mixtures evaluated in both target directions (6,000 trials). Controlled DEV/TEST each add 2,400 trials at −5/0/5/10/15 dB. Enrollment remains clean. All candidate construction, Qwen-TSE, fixed CSG, adaptive mapping, GNR K/R, model hashes, and metric code were frozen before noisy TEST. TEST was executed once.
 
 ## Main findings
 
-- Natural TEST primary swap count: {c['primary_noisy_swap_count']}; Pool D cosine recovery {pct(c['pool_d_selected_recovery_rate_on_primary_swaps'])}, oracle {pct(c['pool_d_oracle_recovery_rate_on_primary_swaps'])}, gap {pct(c['pool_d_selector_gap_on_primary_swaps'])}, control regression {pct(c['pool_d_control_regression_rate'])}.
+- Natural TEST primary swap count: {c['primary_noisy_swap_count']}; CDCS-5 cosine recovery {pct(c['cdcs5_direct_recovery_rate_on_primary_swaps'])}, oracle {pct(c['cdcs5_oracle_recovery_rate_on_primary_swaps'])}, gap {pct(c['cdcs5_selector_gap_on_primary_swaps'])}, control regression {pct(c['cdcs5_control_regression_rate'])}.
 - Adaptive policy: **{adaptive['selected_policy']}**, temporal tolerance `w={adaptive['selected_temporal_tolerance']}`. Residual calibration Spearman {fmt(cal['spearman'])}, MAE {fmt(cal['mae_db'])} dB.
 - GNR: {gnr['selected']} (`K={gnr['K']}`, `R={gnr['R']}`), frozen on DEV. Best-generative comparison arm: {best['selected_name']}.
 - STOI/ESTOI/PESQ and generative SI-SDR remain diagnostic only and are excluded from the noisy main table.
@@ -429,21 +429,21 @@ Continuous metrics use 10,000 paired bootstrap resamples and binary metrics use 
 """ + "\n".join(f"- `{key} = {value}`" for key, value in verdict.items()) + "\n"
     atomic_text(DOCS / "NOISY_TSE_MAIN_REPORT.md", main)
 
-    pool = f"""# Noisy Pool D Analysis
+    pool = f"""# Noisy CDCS-5 Analysis
 
-On natural TEST, Pool D recovers {pct(c['pool_d_selected_recovery_rate_on_primary_swaps'])} of {c['primary_noisy_swap_count']} noisy primary swaps. Oracle availability is {pct(c['pool_d_oracle_recovery_rate_on_primary_swaps'])}; the selector gap is {pct(c['pool_d_selector_gap_on_primary_swaps'])}. Correct-case regression is {pct(c['pool_d_control_regression_rate'])}. Verdict: **{verdict['NOISY_POOL_D_REPAIR']}**.
+On natural TEST, CDCS-5 recovers {pct(c['cdcs5_direct_recovery_rate_on_primary_swaps'])} of {c['primary_noisy_swap_count']} noisy primary swaps. Oracle availability is {pct(c['cdcs5_oracle_recovery_rate_on_primary_swaps'])}; the selector gap is {pct(c['cdcs5_selector_gap_on_primary_swaps'])}. Correct-case regression is {pct(c['cdcs5_control_regression_rate'])}. Verdict: **{verdict['NOISY_CDCS5_REPAIR']}**.
 
-- TF-map-only recoverability: {pct(c['pool_d_tfmap_only_recovery_rate_on_primary_swaps'])}
-- Segmented-view-only recoverability: {pct(c['pool_d_segment_only_recovery_rate_on_primary_swaps'])}
-- TF-map/segmented overlap: {pct(c['pool_d_tfmap_segment_overlap_rate_on_primary_swaps'])}
+- TF-map-only recoverability: {pct(c['cdcs5_tfmap_only_recovery_rate_on_primary_swaps'])}
+- Segmented-view-only recoverability: {pct(c['cdcs5_segment_only_recovery_rate_on_primary_swaps'])}
+- TF-map/segmented overlap: {pct(c['cdcs5_tfmap_segment_overlap_rate_on_primary_swaps'])}
 
 Candidates are full, first, middle, final, and TF-map/context full, all from the same clean enrollment. Selection uses frozen enrollment ECAPA cosine only. Clean targets, interferers, transcripts, WER, SI-SDR, SNR, and swap labels are evaluation-only.
 """
-    atomic_text(DOCS / "NOISY_POOL_D_ANALYSIS.md", pool)
+    atomic_text(DOCS / "NOISY_CDCS5_ANALYSIS.md", pool)
 
     grounding = f"""# Noisy Grounding Analysis
 
-Q-Full unrestricted decoding is compared with fixed CSG (`λ=1,w=0`) and **{adaptive['selected_policy']}** (`w={adaptive['selected_temporal_tolerance']}`). Source-threshold and TSE-DEV-calibrated policies were compared on controlled DEV; TEST reused the frozen winner. Observation blending is never used because it would reintroduce the competing speaker.
+Qwen-TSE unrestricted decoding is compared with fixed CSG (`λ=1,w=0`) and **{adaptive['selected_policy']}** (`w={adaptive['selected_temporal_tolerance']}`). Source-threshold and TSE-DEV-calibrated policies were compared on controlled DEV; TEST reused the frozen winner. Observation blending is never used because it would reintroduce the competing speaker.
 
 Residual calibration: Pearson {fmt(cal['pearson'])}, Spearman {fmt(cal['spearman'])}, MAE {fmt(cal['mae_db'])} dB, RMSE {fmt(cal['rmse_db'])} dB. Fixed CSG content-control verdict: **{verdict['FIXED_CSG_CONTENT_CONTROL']}**. Adaptive value: **{verdict['ADAPTIVE_CSG_VALUE']}**.
 """
@@ -451,7 +451,7 @@ Residual calibration: Pearson {fmt(cal['pearson'])}, Spearman {fmt(cal['spearman
 
     gnr_report = f"""# GNR-LLM TSE Analysis
 
-GNR uses one frozen Q-Full teacher-forced pass over the immutable complete adaptive anchor. Each position chooses the highest-scoring token in `TopK ∩ HammingBall_R`, union the anchor; refined tokens never feed later histories. DEV selected **{gnr['selected']}** (`K={gnr['K']}, R={gnr['R']}`).
+GNR uses one frozen Qwen-TSE teacher-forced pass over the immutable complete adaptive anchor. Each position chooses the highest-scoring token in `TopK ∩ HammingBall_R`, union the anchor; refined tokens never feed later histories. DEV selected **{gnr['selected']}** (`K={gnr['K']}, R={gnr['R']}`).
 
 - Median accepted LLM score margin: {fmt(mech['median_accepted_llm_score_margin'], 4)}
 - Mean unchanged-position fraction: {pct(mech['mean_fraction_positions_unchanged'])}
@@ -466,13 +466,13 @@ Clean target tokens were used only for the labeled DEV mechanism analysis, never
     coauthor = f"""# Noisy TSE Coauthor Summary
 
 1. **Does noise increase wrong-speaker extraction?** Natural TEST contains {c['primary_noisy_swap_count']} high-confidence primary swaps; compare carefully with clean because definitions differ.
-2. **Does Pool D fix it?** {pct(c['pool_d_selected_recovery_rate_on_primary_swaps'])}; verdict **{verdict['NOISY_POOL_D_REPAIR']}**.
-3. **How close is selection to oracle?** Oracle {pct(c['pool_d_oracle_recovery_rate_on_primary_swaps'])}; gap {pct(c['pool_d_selector_gap_on_primary_swaps'])}.
-4. **Does Q-Full drift at low SNR?** See `content_wer_vs_snr.pdf`; the plot reports the data without forcing the hypothesis.
+2. **Does CDCS-5 fix it?** {pct(c['cdcs5_direct_recovery_rate_on_primary_swaps'])}; verdict **{verdict['NOISY_CDCS5_REPAIR']}**.
+3. **How close is selection to oracle?** Oracle {pct(c['cdcs5_oracle_recovery_rate_on_primary_swaps'])}; gap {pct(c['cdcs5_selector_gap_on_primary_swaps'])}.
+4. **Does Qwen-TSE drift at low SNR?** See `content_wer_vs_snr.pdf`; the plot reports the data without forcing the hypothesis.
 5. **Does fixed CSG help?** **{verdict['FIXED_CSG_CONTENT_CONTROL']}**.
 6. **Does adaptive grounding help?** **{verdict['ADAPTIVE_CSG_VALUE']}**.
 7. **Does GNR improve quality?** Quality **{verdict['GNR_QUALITY_RECOVERY']}**, content preservation **{verdict['GNR_CONTENT_PRESERVATION']}**.
-8. **Strongest generative system?** {best['selected_name']} on DEV; Pool D direct remains the deterministic reference.
+8. **Strongest generative system?** {best['selected_name']} on DEV; CDCS-5 direct remains the deterministic reference.
 9. **ICASSP claim:** repair target identity before grounding, constrain generation to control drift, and treat GNR only as local quality refinement.
 """
     atomic_text(DOCS / "NOISY_TSE_COAUTHOR_SUMMARY.md", coauthor)
@@ -504,8 +504,8 @@ def paper_tex(main_rows: list[dict[str, Any]], controlled_rows: list[dict[str, A
     g2, g3, g5, g6 = (test[x]["natural"] for x in ("G2", "G3", "G5", "G6"))
     paragraph = (
         f"Ambient noise produced {c['primary_noisy_swap_count']} high-confidence primary speaker swaps on natural TEST. "
-        f"Pool D recovered {pct(c['pool_d_selected_recovery_rate_on_primary_swaps'])} versus {pct(c['pool_d_oracle_recovery_rate_on_primary_swaps'])} oracle availability, with {pct(c['pool_d_control_regression_rate'])} control regression. "
-        f"Target WER changed from {pct(g2['target_WER_capped'])} for unrestricted Q-Full to {pct(g3['target_WER_capped'])} with fixed CSG and {pct(g5['target_WER_capped'])} with frozen adaptive CSG. "
+        f"CDCS-5 recovered {pct(c['cdcs5_direct_recovery_rate_on_primary_swaps'])} versus {pct(c['cdcs5_oracle_recovery_rate_on_primary_swaps'])} oracle availability, with {pct(c['cdcs5_control_regression_rate'])} control regression. "
+        f"Target WER changed from {pct(g2['target_WER_capped'])} for unrestricted Qwen-TSE to {pct(g3['target_WER_capped'])} with fixed CSG and {pct(g5['target_WER_capped'])} with frozen adaptive CSG. "
         f"GNR changed P808 from {fmt(g5['dnsmos_p808'])} to {fmt(g6['dnsmos_p808'])} and UTMOS from {fmt(g5['utmos'])} to {fmt(g6['utmos'])}, yielding quality/content verdicts {verdict['GNR_QUALITY_RECOVERY']}/{verdict['GNR_CONTENT_PRESERVATION']}. "
         "Overall, the results support repairing target identity before language-model grounding while treating generative quality gains and content drift as separate paired outcomes."
     )

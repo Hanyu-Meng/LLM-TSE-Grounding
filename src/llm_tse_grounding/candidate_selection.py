@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from math import isfinite
 from typing import Mapping, Sequence
 
-POOL_D = ("full", "first", "middle", "final", "tfmap_context_full")
+CDCS5_CANDIDATES = ("full", "first", "middle", "final", "tfmap_context_full")
 
 
 @dataclass(frozen=True)
@@ -25,12 +25,12 @@ class Selection:
 
 def select_by_enrollment_similarity(
     scores: Mapping[str, float],
-    candidate_order: Sequence[str] = POOL_D,
+    candidate_order: Sequence[str] = CDCS5_CANDIDATES,
 ) -> Selection:
     """Select the candidate with maximum target-enrollment similarity.
 
     Ties are resolved by the declared candidate order, matching the frozen
-    Pool-D protocol.  All requested candidates must have a finite score.
+    CDCS-5 protocol.  All requested candidates must have a finite score.
     """
 
     order = tuple(candidate_order)
@@ -51,7 +51,7 @@ def select_by_enrollment_similarity(
 
 def select_from_candidate_record(
     candidates: Mapping[str, Mapping[str, float]],
-    candidate_order: Sequence[str] = POOL_D,
+    candidate_order: Sequence[str] = CDCS5_CANDIDATES,
     score_key: str = "speaker_similarity_to_enrollment",
 ) -> Selection:
     """Select directly from a JSON-like candidate metric record."""

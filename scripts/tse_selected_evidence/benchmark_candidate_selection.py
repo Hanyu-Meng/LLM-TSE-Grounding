@@ -20,10 +20,10 @@ ROOT = Path(__file__).resolve().parents[2]
 ANALYSIS = ROOT / "analysis/selected_evidence"
 ORDER = ("full", "first", "middle", "final", "tfmap_context_full")
 POOLS = {
-    "Pool A": ("full",),
-    "Pool B": ("full", "tfmap_context_full"),
-    "Pool C": ("full", "first", "middle", "final"),
-    "Pool D": ORDER,
+    "Primary-only": ("full",),
+    "CDCS-2": ("full", "tfmap_context_full"),
+    "WeSep multiview": ("full", "first", "middle", "final"),
+    "CDCS-5": ORDER,
 }
 
 

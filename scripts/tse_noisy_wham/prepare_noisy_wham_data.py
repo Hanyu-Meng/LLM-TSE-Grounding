@@ -729,7 +729,7 @@ def audit() -> int:
 
 ## Verdict
 
-**{summary['status']}**. This audit covers waveform construction and manifest integrity only. No WeSep, Q-Full, CosyVoice synthesis, ASR, or noisy TEST model result was loaded.
+**{summary['status']}**. This audit covers waveform construction and manifest integrity only. No WeSep, Qwen-TSE, CosyVoice synthesis, ASR, or noisy TEST model result was loaded.
 
 The official Libri2Mix `mix_both` waveforms were generated from the existing frozen official per-mixture source/noise/gain metadata. Existing clean `mix_clean`, `s1`, and `s2` files were not overwritten. Controlled-SNR waveforms use the preregistered 240-mixture split-specific samples and the same official WHAM recording/segment at all five SNRs.
 

@@ -16,7 +16,7 @@ OUTPUT = ROOT / "results/paper_tables"
 CLEAN_SOURCE = ROOT / "results/selected_evidence_test/MAIN_ICASSP_TEST_TABLE.csv"
 CLEAN_GNR_SOURCE = (
     ROOT
-    / "results/selected_evidence_test/systems/pool_d_qfull_csg_gnr_k20_r2/summary.json"
+    / "results/selected_evidence_test/systems/qwen_tse_gnr_cdcs5_k20_r2/summary.json"
 )
 CLEAN_GNR_PROTOCOL = ROOT / "analysis/clean_table_completion/clean_gnr_protocol.json"
 NOISY_SOURCE = ROOT / "results/noisy_tse/NOISY_MAIN_TABLE.csv"
@@ -94,9 +94,9 @@ def build_clean_rows() -> list[dict[str, Any]]:
     }
     selected = [
         ("D0", "Primary WeSep", "Primary WeSep", "pre-registered clean TEST"),
-        ("D3", "Pool D direct", "Pool D Selected Candidate", "pre-registered clean TEST"),
-        ("G2", "Pool D → Q-Full UD", "Pool D Selected -> Q-Full UD", "pre-registered clean TEST"),
-        ("G3", "Pool D → Q-Full + CSG", "Pool D Selected -> Q-Full + CSG", "pre-registered clean TEST"),
+        ("D3", "CDCS-5 direct", "CDCS-5 direct", "pre-registered clean TEST"),
+        ("G2", "Qwen-TSE UD", "Qwen-TSE UD (CDCS-5 evidence)", "pre-registered clean TEST"),
+        ("G3", "Qwen-TSE fixed CSG", "Qwen-TSE fixed CSG (CDCS-5 evidence)", "pre-registered clean TEST"),
     ]
     rows: list[dict[str, Any]] = []
     for code, label, source_name, protocol in selected:
@@ -125,14 +125,14 @@ def build_clean_rows() -> list[dict[str, Any]]:
         and protocol.get("configuration") == {
             "K": 20,
             "R": 2,
-            "anchor": "pool_d_qfull_csg_lambda_1",
+            "anchor": "qwen_tse_fixed_csg_cdcs5_lambda_1",
         }
     ):
         raise RuntimeError("Clean GNR completion/provenance gate failed")
     full = gnr["full_test"]
     rows.append({
         "Code": "G4*",
-        "Method": "Pool D → Q-Full + CSG → GNR (K20/R2)",
+        "Method": "Qwen-TSE GNR (K=20, R=2)",
         "WER": float(full["target_WER"]),
         "Content_Switch": float(full["content_switch_rate"]),
         "Spk_Switch": float(full["acoustic_speaker_switch_rate"]),
@@ -203,7 +203,7 @@ def build_markdown(clean: list[dict[str, Any]], noisy: list[dict[str, Any]]) -> 
         "",
         "`G4*` is a post-hoc clean readback of the K=20/R=2 GNR configuration selected on noisy DEV. It used no clean TEST tuning and does not redefine the original 10-system clean confirmatory test.",
         "",
-        f"Clean GNR changes CSG WER by **{100 * (gnr['WER'] - csg['WER']):+.2f} pp** and P808 by **{gnr['P808'] - csg['P808']:+.3f}**. Direct Pool D remains the clean endpoint.",
+        f"Clean GNR changes CSG WER by **{100 * (gnr['WER'] - csg['WER']):+.2f} pp** and P808 by **{gnr['P808'] - csg['P808']:+.3f}**. Direct CDCS-5 remains the clean endpoint.",
         "",
         "## Natural noisy TEST (6,000 trials)",
         "",
@@ -216,7 +216,7 @@ def build_markdown(clean: list[dict[str, Any]], noisy: list[dict[str, Any]]) -> 
         "",
         "## Final reading",
         "",
-        "- Evidence repair is the robust result: Pool D sharply reduces speaker/content switches in clean and noisy speech.",
+        "- Evidence repair is the robust result: CDCS-5 sharply reduces speaker/content switches in clean and noisy speech.",
         "- CSG is useful inside the grounded generative branch because it reduces unrestricted-decoder drift.",
         "- GNR slightly improves predicted quality but worsens WER, so it is an analysis arm rather than the final endpoint.",
         "- Clean and noisy values are different conditions and must not be averaged or treated as a single pooled benchmark.",
@@ -286,7 +286,7 @@ def main() -> int:
         "clean_gnr_no_clean_test_tuning": read_json(CLEAN_GNR_PROTOCOL).get("clean_test_used_for_configuration") is False,
         "noisy_test_once": read_json(NOISY_EXECUTION).get("execution_count") == 1,
         "no_post_test_tuning": read_json(NOISY_EXECUTION).get("post_test_tuning") is False,
-        "clean_direct_pool_d_is_best_wer": min(clean, key=lambda row: row["WER"])["Code"] == "D3",
+        "clean_direct_cdcs5_is_best_wer": min(clean, key=lambda row: row["WER"])["Code"] == "D3",
         "clean_gnr_improves_p808_but_worsens_wer": clean[4]["P808"] > clean[3]["P808"] and clean[4]["WER"] > clean[3]["WER"],
         "noisy_gnr_improves_p808_utmos_but_worsens_wer": (
             noisy[-1]["P808"] > noisy[-2]["P808"]

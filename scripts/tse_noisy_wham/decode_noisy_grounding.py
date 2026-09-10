@@ -40,8 +40,8 @@ from scripts.tse_selected_evidence.decode_selected_evidence import (  # noqa: E4
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, required=True)
-    parser.add_argument("--pool", choices=("pool_full", "pool_b", "pool_d"), default="pool_d")
-    parser.add_argument("--checkpoint", type=Path, default=ROOT / "experiments/qfull_sme_rawqwen_seed0_20260810_0858/checkpoints/best.pt")
+    parser.add_argument("--pool", choices=("primary", "cdcs2", "cdcs5"), default="cdcs5")
+    parser.add_argument("--checkpoint", type=Path, default=ROOT / "experiments/qwen_tse_sme_rawqwen_seed0_20260810_0858/checkpoints/best.pt")
     parser.add_argument("--qwen", type=Path, default=ROOT / "pretrained/Qwen2.5-0.5B-Instruct")
     parser.add_argument("--wavlm", type=Path, default=ROOT / "pretrained/wavlm-base-plus")
     parser.add_argument("--output-dir", type=Path, required=True)
@@ -131,7 +131,7 @@ def generate_adaptive(
     lambdas: torch.Tensor,
     temporal_tolerance: int,
 ) -> list[torch.LongTensor]:
-    """Greedy Q-Full generation with a fixed per-trial adaptive CSG lambda."""
+    """Greedy Qwen-TSE generation with a fixed per-trial adaptive CSG lambda."""
     model.eval()
     mixture_features, mixture_lengths = model._encode_mixture(
         batch["mixture_values"], batch["mixture_attention_mask"]
@@ -318,7 +318,7 @@ def main() -> int:
     if args.batch_size != 1 or args.num_workers > 1:
         raise ValueError("resource protocol requires batch_size=1 and num_workers<=1")
     if sha256(args.checkpoint) != EXPECTED_CHECKPOINT_SHA256:
-        raise ValueError("frozen Q-Full checkpoint hash mismatch")
+        raise ValueError("frozen Qwen-TSE checkpoint hash mismatch")
     if args.mode == "adaptive_csg" and args.lambda_sidecar is None:
         raise ValueError("adaptive CSG requires --lambda-sidecar")
     if args.mode == "gnr" and args.anchor_records is None:

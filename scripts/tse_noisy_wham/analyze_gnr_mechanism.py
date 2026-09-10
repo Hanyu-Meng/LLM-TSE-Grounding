@@ -42,11 +42,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--anchor-records", type=Path,
-        default=ROOT / "results/noisy_wham/dev/systems/pool_d_residual_csg/per_trial_tokens.jsonl",
+        default=ROOT / "results/noisy_wham/dev/systems/cdcs5_residual_csg/per_trial_tokens.jsonl",
     )
     parser.add_argument(
         "--gnr-records", type=Path,
-        default=ROOT / "results/noisy_wham/dev/systems/pool_d_residual_csg_gnr_k50_r3/per_trial_tokens.jsonl",
+        default=ROOT / "results/noisy_wham/dev/systems/cdcs5_residual_csg_gnr_k50_r3/per_trial_tokens.jsonl",
     )
     parser.add_argument(
         "--prepared-dev-manifest", type=Path,
@@ -61,7 +61,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--radius", type=int, default=3)
     parser.add_argument(
         "--checkpoint", type=Path,
-        default=ROOT / "experiments/qfull_sme_rawqwen_seed0_20260810_0858/checkpoints/best.pt",
+        default=ROOT / "experiments/qwen_tse_sme_rawqwen_seed0_20260810_0858/checkpoints/best.pt",
     )
     parser.add_argument(
         "--qwen", type=Path,
@@ -242,7 +242,7 @@ def analyze_one(model: Any, batch: dict[str, torch.Tensor], anchor: torch.LongTe
 
 def main() -> int:
     args = parse_args()
-    dataset = SelectedEvidenceDataset(args.manifest, "pool_d", "dev")
+    dataset = SelectedEvidenceDataset(args.manifest, "cdcs5", "dev")
     if len(dataset) != args.expected:
         raise ValueError("DEV mechanism dataset coverage failure")
     evaluation = keyed(args.evaluation, args.expected)

@@ -63,70 +63,70 @@ SYSTEMS: OrderedDict[str, dict[str, Any]] = OrderedDict([
         "dev": ROOT / "dev_outputs/WeSep/per_trial_metrics.jsonl",
         "test": ROOT / "results/selected_evidence_test/systems/primary_wesep/per_trial_metrics.jsonl",
     }),
-    ("pool_b_selected", {
-        "name": "Pool B Selected Candidate",
-        "short": "Pool B selected",
-        "dev": ROOT / "results/selected_evidence/systems/pool_b_selected/per_trial_metrics.jsonl",
-        "test": ROOT / "results/selected_evidence_test/systems/pool_b_selected/per_trial_metrics.jsonl",
+    ("cdcs2_direct", {
+        "name": "CDCS-2 direct",
+        "short": "CDCS-2 selected",
+        "dev": ROOT / "results/selected_evidence/systems/cdcs2_direct/per_trial_metrics.jsonl",
+        "test": ROOT / "results/selected_evidence_test/systems/cdcs2_direct/per_trial_metrics.jsonl",
     }),
-    ("pool_d_selected", {
-        "name": "Pool D Selected Candidate",
-        "short": "Pool D direct",
-        "dev": ROOT / "results/selected_evidence/systems/pool_d_selected/per_trial_metrics.jsonl",
-        "test": ROOT / "results/selected_evidence_test/systems/pool_d_selected/per_trial_metrics.jsonl",
+    ("cdcs5_direct", {
+        "name": "CDCS-5 direct",
+        "short": "CDCS-5 direct",
+        "dev": ROOT / "results/selected_evidence/systems/cdcs5_direct/per_trial_metrics.jsonl",
+        "test": ROOT / "results/selected_evidence_test/systems/cdcs5_direct/per_trial_metrics.jsonl",
     }),
-    ("pool_d_s3_recon", {
-        "name": "Pool D Selected S3 Reconstruction",
-        "short": "Pool D S3 recon",
-        "dev": ROOT / "results/selected_evidence/systems/pool_d_s3_recon/per_trial_metrics.jsonl",
-        "test": ROOT / "results/selected_evidence_test/systems/pool_d_s3_recon/per_trial_metrics.jsonl",
+    ("cdcs5_s3_recon", {
+        "name": "CDCS-5 S3 reconstruction",
+        "short": "CDCS-5 S3 recon",
+        "dev": ROOT / "results/selected_evidence/systems/cdcs5_s3_recon/per_trial_metrics.jsonl",
+        "test": ROOT / "results/selected_evidence_test/systems/cdcs5_s3_recon/per_trial_metrics.jsonl",
     }),
-    ("original_qfull_ud", {
-        "name": "Original Q-Full UD",
-        "short": "Original Q-Full UD",
+    ("qwen_tse_ud_primary", {
+        "name": "Qwen-TSE UD (Primary evidence)",
+        "short": "Qwen-TSE UD (Primary evidence)",
         "dev": ROOT / "grounding/csg_lambda_0/per_trial_metrics.jsonl",
-        "test": ROOT / "results/selected_evidence_test/systems/original_qfull_ud/per_trial_metrics.jsonl",
+        "test": ROOT / "results/selected_evidence_test/systems/qwen_tse_ud_primary/per_trial_metrics.jsonl",
     }),
-    ("original_qfull_csg", {
-        "name": "Original Q-Full + CSG lambda=1",
-        "short": "Original Q-Full + CSG",
+    ("qwen_tse_fixed_csg_primary", {
+        "name": "Qwen-TSE fixed CSG (Primary evidence)",
+        "short": "Qwen-TSE fixed CSG (Primary evidence)",
         "dev": ROOT / "grounding/csg_lambda_1/per_trial_metrics.jsonl",
-        "test": ROOT / "results/selected_evidence_test/systems/original_qfull_csg/per_trial_metrics.jsonl",
+        "test": ROOT / "results/selected_evidence_test/systems/qwen_tse_fixed_csg_primary/per_trial_metrics.jsonl",
     }),
-    ("pool_b_qfull_ud", {
-        "name": "Pool B Selected -> Q-Full UD",
-        "short": "Pool B Q-Full UD",
-        "dev": ROOT / "results/selected_evidence/systems/pool_b_qfull_ud/per_trial_metrics.jsonl",
-        "test": ROOT / "results/selected_evidence_test/systems/pool_b_qfull_ud/per_trial_metrics.jsonl",
+    ("qwen_tse_ud_cdcs2", {
+        "name": "Qwen-TSE UD (CDCS-2 evidence)",
+        "short": "Qwen-TSE UD (CDCS-2 evidence)",
+        "dev": ROOT / "results/selected_evidence/systems/qwen_tse_ud_cdcs2/per_trial_metrics.jsonl",
+        "test": ROOT / "results/selected_evidence_test/systems/qwen_tse_ud_cdcs2/per_trial_metrics.jsonl",
     }),
-    ("pool_b_qfull_csg", {
-        "name": "Pool B Selected -> Q-Full + CSG lambda=1",
-        "short": "Pool B Q-Full + CSG",
-        "dev": ROOT / "results/selected_evidence/systems/pool_b_qfull_csg/per_trial_metrics.jsonl",
-        "test": ROOT / "results/selected_evidence_test/systems/pool_b_qfull_csg/per_trial_metrics.jsonl",
+    ("qwen_tse_fixed_csg_cdcs2", {
+        "name": "Qwen-TSE fixed CSG (CDCS-2 evidence)",
+        "short": "Qwen-TSE fixed CSG (CDCS-2 evidence)",
+        "dev": ROOT / "results/selected_evidence/systems/qwen_tse_fixed_csg_cdcs2/per_trial_metrics.jsonl",
+        "test": ROOT / "results/selected_evidence_test/systems/qwen_tse_fixed_csg_cdcs2/per_trial_metrics.jsonl",
     }),
-    ("pool_d_qfull_ud", {
-        "name": "Pool D Selected -> Q-Full UD",
-        "short": "Pool D Q-Full UD",
-        "dev": ROOT / "results/selected_evidence/systems/pool_d_qfull_ud/per_trial_metrics.jsonl",
-        "test": ROOT / "results/selected_evidence_test/systems/pool_d_qfull_ud/per_trial_metrics.jsonl",
+    ("qwen_tse_ud_cdcs5", {
+        "name": "Qwen-TSE UD (CDCS-5 evidence)",
+        "short": "Qwen-TSE UD (CDCS-5 evidence)",
+        "dev": ROOT / "results/selected_evidence/systems/qwen_tse_ud_cdcs5/per_trial_metrics.jsonl",
+        "test": ROOT / "results/selected_evidence_test/systems/qwen_tse_ud_cdcs5/per_trial_metrics.jsonl",
     }),
-    ("pool_d_qfull_csg", {
-        "name": "Pool D Selected -> Q-Full + CSG lambda=1",
-        "short": "Pool D Q-Full + CSG",
-        "dev": ROOT / "results/selected_evidence/systems/pool_d_qfull_csg/per_trial_metrics.jsonl",
-        "test": ROOT / "results/selected_evidence_test/systems/pool_d_qfull_csg/per_trial_metrics.jsonl",
+    ("qwen_tse_fixed_csg_cdcs5", {
+        "name": "Qwen-TSE fixed CSG (CDCS-5 evidence)",
+        "short": "Qwen-TSE fixed CSG (CDCS-5 evidence)",
+        "dev": ROOT / "results/selected_evidence/systems/qwen_tse_fixed_csg_cdcs5/per_trial_metrics.jsonl",
+        "test": ROOT / "results/selected_evidence_test/systems/qwen_tse_fixed_csg_cdcs5/per_trial_metrics.jsonl",
     }),
 ])
 
-TRADEOFF_SYSTEMS = ("pool_d_selected", "pool_d_qfull_ud", "pool_d_qfull_csg")
+TRADEOFF_SYSTEMS = ("cdcs5_direct", "qwen_tse_ud_cdcs5", "qwen_tse_fixed_csg_cdcs5")
 COMPARISONS = OrderedDict([
-    ("A", ("pool_d_selected", "pool_d_qfull_ud",
-           "Pool D direct vs Pool D Q-Full UD")),
-    ("B", ("pool_d_qfull_ud", "pool_d_qfull_csg",
-           "Pool D Q-Full UD vs Pool D Q-Full + CSG")),
-    ("C", ("pool_d_selected", "pool_d_qfull_csg",
-           "Pool D direct vs Pool D Q-Full + CSG")),
+    ("A", ("cdcs5_direct", "qwen_tse_ud_cdcs5",
+           "CDCS-5 direct vs Qwen-TSE UD (CDCS-5 evidence)")),
+    ("B", ("qwen_tse_ud_cdcs5", "qwen_tse_fixed_csg_cdcs5",
+           "Qwen-TSE UD (CDCS-5 evidence) vs Qwen-TSE fixed CSG (CDCS-5 evidence)")),
+    ("C", ("cdcs5_direct", "qwen_tse_fixed_csg_cdcs5",
+           "CDCS-5 direct vs Qwen-TSE fixed CSG (CDCS-5 evidence)")),
 ])
 
 
@@ -844,9 +844,9 @@ def latex_table(tradeoff: list[dict[str, Any]]) -> str:
         subset = [row for row in tradeoff if row["split"] == split]
         for index, row in enumerate(subset):
             name = {
-                "pool_d_selected": "Pool D direct",
-                "pool_d_qfull_ud": "Pool D Q-Full UD",
-                "pool_d_qfull_csg": "Pool D Q-Full + CSG",
+                "cdcs5_direct": "CDCS-5 direct",
+                "qwen_tse_ud_cdcs5": "Qwen-TSE UD (CDCS-5 evidence)",
+                "qwen_tse_fixed_csg_cdcs5": "Qwen-TSE fixed CSG (CDCS-5 evidence)",
             }[row["system_slug"]]
             lines.append(
                 f"{split if index == 0 else ''} & {name} & {100 * row['wer']:.2f} & "
@@ -877,15 +877,15 @@ def aggregate() -> None:
             summaries.append(summarize_rows(split, slug, rows))
     write_csv(RESULTS / "INTELLIGIBILITY_QUALITY_TABLE.csv", summaries)
     tradeoff = [row for row in summaries if row["system_slug"] in TRADEOFF_SYSTEMS]
-    write_csv(RESULTS / "POOL_D_GROUNDING_TRADEOFF.csv", tradeoff)
+    write_csv(RESULTS / "CDCS5_GROUNDING_TRADEOFF.csv", tradeoff)
     paired = paired_results(by_split)
     write_csv(RESULTS / "PAIRED_BOOTSTRAP.csv", paired)
     atomic_json(RESULTS / "paired_bootstrap.json", paired)
     decisions = {
-        "QFULL_INTELLIGIBILITY_VALUE": improvement_decision(
+        "QWEN_TSE_INTELLIGIBILITY_VALUE": improvement_decision(
             paired, "A", [("STOI", "higher"), ("ESTOI", "higher")],
         ),
-        "QFULL_QUALITY_VALUE": improvement_decision(
+        "QWEN_TSE_QUALITY_VALUE": improvement_decision(
             paired, "A", [("PESQ", "higher"), ("DNSMOS", "higher")],
         ),
         "CSG_INTELLIGIBILITY_VALUE": improvement_decision(
@@ -927,9 +927,9 @@ def write_main_report(
 ) -> None:
     protocol = json.loads((RESULTS / "protocol_validation.json").read_text(encoding="utf-8"))
     asset = json.loads((RESULTS / "asset_audit.json").read_text(encoding="utf-8"))
-    direct = next(row for row in tradeoff if row["split"] == "TEST" and row["system_slug"] == "pool_d_selected")
-    ud = next(row for row in tradeoff if row["split"] == "TEST" and row["system_slug"] == "pool_d_qfull_ud")
-    csg = next(row for row in tradeoff if row["split"] == "TEST" and row["system_slug"] == "pool_d_qfull_csg")
+    direct = next(row for row in tradeoff if row["split"] == "TEST" and row["system_slug"] == "cdcs5_direct")
+    ud = next(row for row in tradeoff if row["split"] == "TEST" and row["system_slug"] == "qwen_tse_ud_cdcs5")
+    csg = next(row for row in tradeoff if row["split"] == "TEST" and row["system_slug"] == "qwen_tse_fixed_csg_cdcs5")
 
     a_dev = {metric: comparison_row(paired, "DEV", "A", metric) for metric in ("STOI", "ESTOI", "PESQ", "DNSMOS", "WER")}
     a_test = {metric: comparison_row(paired, "TEST", "A", metric) for metric in ("STOI", "ESTOI", "PESQ", "DNSMOS", "WER")}
@@ -944,12 +944,12 @@ def write_main_report(
         )
 
     paragraph = (
-        "On the frozen TEST set, " + sentence("Pool D direct", direct) + "; "
-        + sentence("Q-Full UD", ud) + "; and " + sentence("Q-Full + CSG", csg)
-        + ". Q-Full's waveform-intelligibility value is "
-        + decisions["QFULL_INTELLIGIBILITY_VALUE"].lower()
+        "On the frozen TEST set, " + sentence("CDCS-5 direct", direct) + "; "
+        + sentence("Qwen-TSE UD", ud) + "; and " + sentence("Qwen-TSE fixed CSG", csg)
+        + ". Qwen-TSE's waveform-intelligibility value is "
+        + decisions["QWEN_TSE_INTELLIGIBILITY_VALUE"].lower()
         + ", while its perceptual-quality value is "
-        + decisions["QFULL_QUALITY_VALUE"].lower()
+        + decisions["QWEN_TSE_QUALITY_VALUE"].lower()
         + ". Relative to UD, CSG's intelligibility/content recovery is "
         + decisions["CSG_INTELLIGIBILITY_VALUE"].lower()
         + " and quality preservation is "
@@ -972,16 +972,16 @@ def write_main_report(
 
 The post-hoc frozen-output evaluation is complete for **10 systems × 6,000 DEV × 6,000 TEST trials**. Asset integrity is PASS (`missing=0`, `duplicate=0`, `failed=0` for every frozen source). {warning}
 
-- Does Q-Full improve waveform-level intelligibility over direct Pool D? **{decisions['QFULL_INTELLIGIBILITY_VALUE']}**
-- Does Q-Full improve perceptual quality? **{decisions['QFULL_QUALITY_VALUE']}**
-- Does CSG recover intelligibility/content fidelity relative to Q-Full UD? **{decisions['CSG_INTELLIGIBILITY_VALUE']}**
+- Does Qwen-TSE improve waveform-level intelligibility over direct CDCS-5? **{decisions['QWEN_TSE_INTELLIGIBILITY_VALUE']}**
+- Does Qwen-TSE improve perceptual quality? **{decisions['QWEN_TSE_QUALITY_VALUE']}**
+- Does CSG recover intelligibility/content fidelity relative to Qwen-TSE UD? **{decisions['CSG_INTELLIGIBILITY_VALUE']}**
 - Does CSG preserve generative quality? **{decisions['CSG_QUALITY_PRESERVATION']}**
 
 These judgments follow fixed direction rules across both splits and 10,000-resample paired-bootstrap intervals; conflicting metrics or splits yield MIXED. They do not trigger model selection or tuning.
 
 ## Scope and provenance
 
-Only previously frozen waveform outputs were read. No model was trained, no tokens were decoded, no waveform was regenerated, and candidate selection, Q-Full, and CSG were unchanged. Clean target waveforms are used solely as evaluation references. **Additional intrusive metrics are computed post hoc on the previously frozen TEST outputs; no model or decoding decisions are changed.**
+Only previously frozen waveform outputs were read. No model was trained, no tokens were decoded, no waveform was regenerated, and candidate selection, Qwen-TSE, and CSG were unchanged. Clean target waveforms are used solely as evaluation references. **Additional intrusive metrics are computed post hoc on the previously frozen TEST outputs; no model or decoding decisions are changed.**
 
 The source mappings are the same mappings used by `build_icassp_table.py` and `build_icassp_test_table.py`. The machine audit found {len(asset['systems'])} complete system/split sources. STOI and PESQ-WB already existed in every frozen per-trial source; their code path, common lengths, and numerical values were freshly verified on 100 fixed-random DEV trials per system before reuse. Reuse status: **{'PASS' if protocol['stored_stoi_pesq_reuse_valid'] else 'DISABLED; recomputed'}**. ESTOI was newly computed for every trial.
 
@@ -1005,7 +1005,7 @@ The source mappings are the same mappings used by `build_icassp_table.py` and `b
 
 All rows also have mean/median STOI, ESTOI, and PESQ plus metric coverage in `INTELLIGIBILITY_QUALITY_TABLE.csv`. Minimum PESQ coverage is **{pct(pesq_coverage, 2)}**; any coverage below 99% would be explicitly marked here.
 
-## Pool D grounding trade-off
+## CDCS-5 grounding trade-off
 
 ### DEV
 
@@ -1017,15 +1017,15 @@ All rows also have mean/median STOI, ESTOI, and PESQ plus metric coverage in `IN
 
 ## Scientific interpretation
 
-**Pool D direct remains the strongest overall output.** Relative to it, Q-Full UD raises WER by {100 * a_dev['WER']['mean_difference_new_minus_base']:.2f} points on DEV and {100 * a_test['WER']['mean_difference_new_minus_base']:.2f} points on TEST, while reducing STOI by {abs(a_dev['STOI']['mean_difference_new_minus_base']):.3f}/{abs(a_test['STOI']['mean_difference_new_minus_base']):.3f}, ESTOI by {abs(a_dev['ESTOI']['mean_difference_new_minus_base']):.3f}/{abs(a_test['ESTOI']['mean_difference_new_minus_base']):.3f}, and PESQ by {abs(a_dev['PESQ']['mean_difference_new_minus_base']):.3f}/{abs(a_test['PESQ']['mean_difference_new_minus_base']):.3f}. DNSMOS rises by only {a_dev['DNSMOS']['mean_difference_new_minus_base']:+.3f}/{a_test['DNSMOS']['mean_difference_new_minus_base']:+.3f}; the TEST interval includes zero. Thus the data do not support a general Q-Full waveform-intelligibility or perceptual-quality advantage.
+**CDCS-5 direct remains the strongest overall output.** Relative to it, Qwen-TSE UD raises WER by {100 * a_dev['WER']['mean_difference_new_minus_base']:.2f} points on DEV and {100 * a_test['WER']['mean_difference_new_minus_base']:.2f} points on TEST, while reducing STOI by {abs(a_dev['STOI']['mean_difference_new_minus_base']):.3f}/{abs(a_test['STOI']['mean_difference_new_minus_base']):.3f}, ESTOI by {abs(a_dev['ESTOI']['mean_difference_new_minus_base']):.3f}/{abs(a_test['ESTOI']['mean_difference_new_minus_base']):.3f}, and PESQ by {abs(a_dev['PESQ']['mean_difference_new_minus_base']):.3f}/{abs(a_test['PESQ']['mean_difference_new_minus_base']):.3f}. DNSMOS rises by only {a_dev['DNSMOS']['mean_difference_new_minus_base']:+.3f}/{a_test['DNSMOS']['mean_difference_new_minus_base']:+.3f}; the TEST interval includes zero. Thus the data do not support a general Qwen-TSE waveform-intelligibility or perceptual-quality advantage.
 
-**CSG provides a consistent but partial recovery.** Relative to Q-Full UD, it lowers WER by {abs(100 * b_dev['WER']['mean_difference_new_minus_base']):.2f}/{abs(100 * b_test['WER']['mean_difference_new_minus_base']):.2f} points, raises STOI by {b_dev['STOI']['mean_difference_new_minus_base']:.4f}/{b_test['STOI']['mean_difference_new_minus_base']:.4f} and ESTOI by {b_dev['ESTOI']['mean_difference_new_minus_base']:.4f}/{b_test['ESTOI']['mean_difference_new_minus_base']:.4f}, and slightly raises PESQ. DNSMOS falls by only {abs(b_dev['DNSMOS']['mean_difference_new_minus_base']):.3f}/{abs(b_test['DNSMOS']['mean_difference_new_minus_base']):.3f}, within the predeclared preservation margin. CSG therefore reduces generative drift without closing the large gap to direct Pool D.
+**CSG provides a consistent but partial recovery.** Relative to Qwen-TSE UD, it lowers WER by {abs(100 * b_dev['WER']['mean_difference_new_minus_base']):.2f}/{abs(100 * b_test['WER']['mean_difference_new_minus_base']):.2f} points, raises STOI by {b_dev['STOI']['mean_difference_new_minus_base']:.4f}/{b_test['STOI']['mean_difference_new_minus_base']:.4f} and ESTOI by {b_dev['ESTOI']['mean_difference_new_minus_base']:.4f}/{b_test['ESTOI']['mean_difference_new_minus_base']:.4f}, and slightly raises PESQ. DNSMOS falls by only {abs(b_dev['DNSMOS']['mean_difference_new_minus_base']):.3f}/{abs(b_test['DNSMOS']['mean_difference_new_minus_base']):.3f}, within the predeclared preservation margin. CSG therefore reduces generative drift without closing the large gap to direct CDCS-5.
 
 ## Paired significance
 
 Every difference is **new minus base**. Therefore negative is favorable for WER; positive is favorable for STOI, ESTOI, PESQ, and DNSMOS. Each interval uses exactly {BOOTSTRAPS:,} paired bootstrap resamples with fixed seeds. PESQ uses only pairs with both values present and reports `n` explicitly.
 
-Comparisons: A = Pool D direct → Pool D Q-Full UD; B = Pool D Q-Full UD → Pool D Q-Full + CSG; C = Pool D direct → Pool D Q-Full + CSG.
+Comparisons: A = CDCS-5 direct → Qwen-TSE UD (CDCS-5 evidence); B = Qwen-TSE UD (CDCS-5 evidence) → Qwen-TSE fixed CSG (CDCS-5 evidence); C = CDCS-5 direct → Qwen-TSE fixed CSG (CDCS-5 evidence).
 
 ### DEV
 
@@ -1050,7 +1050,7 @@ Intrusive scores can punish harmless phase, prosody, or timing differences in ge
 - Alignment audit: `docs/INTELLIGIBILITY_ALIGNMENT_AUDIT.md`
 - Per-trial results: `results/intelligibility_quality/dev_per_trial.jsonl`, `test_per_trial.jsonl`
 - Full summary: `results/intelligibility_quality/INTELLIGIBILITY_QUALITY_TABLE.csv`
-- Three-system table: `results/intelligibility_quality/POOL_D_GROUNDING_TRADEOFF.csv`
+- Three-system table: `results/intelligibility_quality/CDCS5_GROUNDING_TRADEOFF.csv`
 - Paired results: `results/intelligibility_quality/PAIRED_BOOTSTRAP.csv`
 - ICASSP LaTeX: `results/intelligibility_quality/intelligibility_quality_table.tex`
 """
@@ -1062,7 +1062,7 @@ def validate_outputs() -> None:
         DOCS / "INTELLIGIBILITY_ALIGNMENT_AUDIT.md",
         RESULTS / "dev_per_trial.jsonl", RESULTS / "test_per_trial.jsonl",
         RESULTS / "INTELLIGIBILITY_QUALITY_TABLE.csv",
-        RESULTS / "POOL_D_GROUNDING_TRADEOFF.csv",
+        RESULTS / "CDCS5_GROUNDING_TRADEOFF.csv",
         RESULTS / "PAIRED_BOOTSTRAP.csv",
         RESULTS / "intelligibility_quality_table.tex",
         DOCS / "INTELLIGIBILITY_QUALITY_REPORT.md",
@@ -1084,7 +1084,7 @@ def validate_outputs() -> None:
         if any(any(field not in row for field in required_fields) for row in rows):
             raise ValueError(f"{split} missing required per-trial fields")
     summaries = list(csv.DictReader((RESULTS / "INTELLIGIBILITY_QUALITY_TABLE.csv").open()))
-    tradeoff = list(csv.DictReader((RESULTS / "POOL_D_GROUNDING_TRADEOFF.csv").open()))
+    tradeoff = list(csv.DictReader((RESULTS / "CDCS5_GROUNDING_TRADEOFF.csv").open()))
     paired = list(csv.DictReader((RESULTS / "PAIRED_BOOTSTRAP.csv").open()))
     if len(summaries) != 20 or len(tradeoff) != 6 or len(paired) != 30:
         raise ValueError(
@@ -1094,7 +1094,7 @@ def validate_outputs() -> None:
 
 
 def final_summary() -> None:
-    rows = list(csv.DictReader((RESULTS / "POOL_D_GROUNDING_TRADEOFF.csv").open()))
+    rows = list(csv.DictReader((RESULTS / "CDCS5_GROUNDING_TRADEOFF.csv").open()))
     test = {row["system_slug"]: row for row in rows if row["split"] == "TEST"}
     decisions = json.loads((RESULTS / "scientific_judgments.json").read_text(encoding="utf-8"))
     full = list(csv.DictReader((RESULTS / "INTELLIGIBILITY_QUALITY_TABLE.csv").open()))
@@ -1119,14 +1119,14 @@ def final_summary() -> None:
 
     print(f"DEV_COMPLETE:\n{'YES' if complete['DEV'] else 'NO'}\n")
     print(f"TEST_COMPLETE:\n{'YES' if complete['TEST'] else 'NO'}\n")
-    system_block("POOL_D_DIRECT_TEST", "pool_d_selected")
+    system_block("CDCS5_DIRECT_TEST", "cdcs5_direct")
     print()
-    system_block("POOL_D_QFULL_UD_TEST", "pool_d_qfull_ud")
+    system_block("QWEN_TSE_UD_CDCS5_TEST", "qwen_tse_ud_cdcs5")
     print()
-    system_block("POOL_D_QFULL_CSG_TEST", "pool_d_qfull_csg")
+    system_block("QWEN_TSE_FIXED_CSG_CDCS5_TEST", "qwen_tse_fixed_csg_cdcs5")
     print()
     for key in (
-        "QFULL_INTELLIGIBILITY_VALUE", "QFULL_QUALITY_VALUE",
+        "QWEN_TSE_INTELLIGIBILITY_VALUE", "QWEN_TSE_QUALITY_VALUE",
         "CSG_INTELLIGIBILITY_VALUE", "CSG_QUALITY_PRESERVATION",
     ):
         print(f"{key}:\n{decisions[key]}\n")

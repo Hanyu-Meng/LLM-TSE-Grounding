@@ -41,14 +41,15 @@ The model conditions on a target-speaker embedding, WavLM mixture features,
 and evidence S3 tokens, then predicts target S3 tokens. Frozen model paths and
 manifests are supplied through `configs/tse_train_qwen_wavlm_fsq.yaml`.
 
-## 3. Generate complementary WeSep candidates
+## 3. Generate CDCS candidates
 
 ```text
 target enrollment
     -> full / early / middle / late views
     -> primary WeSep candidates
     + TF-map/context candidate
-    -> speaker embeddings and acoustic/ASR diagnostics
+    -> frozen speaker embeddings
+    -> CDCS-2 or CDCS-5 target-consistent selection
 ```
 
 Primary entry points:
@@ -64,7 +65,7 @@ Primary entry points:
 selector. Evaluation-only references may appear in analysis outputs but are
 not selector inputs.
 
-## 4. Assemble selected evidence
+## 4. Assemble CDCS evidence
 
 Primary entry points:
 
@@ -74,8 +75,9 @@ Primary entry points:
 - `scripts/tse_selected_evidence/benchmark_candidate_selection.py`
 - `scripts/tse_selected_evidence/validate_selected_smoke.py`
 
-The output is a frozen per-trial evidence choice plus aligned waveform/token
-references for the downstream deterministic and generative arms.
+The output is a frozen per-trial CDCS evidence choice plus aligned
+waveform/token references for `CDCS-5 direct`, `Qwen-TSE UD`, `Qwen-TSE fixed
+CSG`, and the declared GNR ablation.
 
 ## 5. Tokenize, ground, and synthesize
 
@@ -91,7 +93,7 @@ Primary entry points:
 `decode_selected_evidence.py` and `decode_noisy_grounding.py` contain the
 actual Torch decoding path used by the campaign. The smaller
 `src/llm_tse_grounding/` modules are dependency-light reference operators for
-auditing the same Pool-D, FSQ, CSG, and GNR invariants.
+auditing the same CDCS-5, FSQ, CSG, and GNR invariants.
 
 ## 6. Clean evaluation
 
@@ -154,6 +156,7 @@ state and is therefore an audit/reference tool in a fresh clone. Set
 - recovery-model and learned-selector branches that failed the DEV gate;
 - post-TEST selective-router and multi-lambda/token-level method-development
   experiments;
+- general speech-enhancement models and evaluators not used by this paper;
 - internal agent, automation, or research-management files.
 
 These exclusions keep the repository reviewable and prevent partial DEV

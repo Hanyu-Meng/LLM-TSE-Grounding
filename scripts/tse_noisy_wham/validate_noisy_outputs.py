@@ -66,7 +66,7 @@ def main() -> int:
         checks.append(f"{name}: {count} rows")
     required = [
         *(ROOT / "docs" / name for name in (
-            "NOISY_TSE_MAIN_REPORT.md", "NOISY_POOL_D_ANALYSIS.md",
+            "NOISY_TSE_MAIN_REPORT.md", "NOISY_CDCS5_ANALYSIS.md",
             "NOISY_GROUNDING_ANALYSIS.md", "GNR_LLM_TSE_ANALYSIS.md",
             "NOISY_TSE_COAUTHOR_SUMMARY.md", "GNR_TSE_IMPLEMENTATION_AUDIT.md",
         )),

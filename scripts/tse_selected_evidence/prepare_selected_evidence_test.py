@@ -24,9 +24,9 @@ PREPARED = ROOT / "manifests/tse_test_prepared.jsonl"
 AUDIT = ROOT / "analysis/wesep_speaker_selection/test_all_trials.jsonl"
 ORDER = ("full", "first", "middle", "final", "tfmap_context_full")
 POOLS = {
-    "pool_full": ("full",),
-    "pool_b": ("full", "tfmap_context_full"),
-    "pool_d": ORDER,
+    "primary": ("full",),
+    "cdcs2": ("full", "tfmap_context_full"),
+    "cdcs5": ORDER,
 }
 EXPECTED_COHORTS = Counter({
     "natural_primary_swap": 398,
@@ -342,10 +342,10 @@ def finalize() -> int:
         })
         evaluation.append(dict(prepared[trial_id]) | {
             "cohort": row["cohort"],
-            "pool_b_selected_candidate": row["selected"]["pool_b"],
-            "pool_d_selected_candidate": row["selected"]["pool_d"],
-            "pool_b_selected_waveform": caches["pool_b"][1][trial_id],
-            "pool_d_selected_waveform": caches["pool_d"][1][trial_id],
+            "cdcs2_direct_candidate": row["selected"]["cdcs2"],
+            "cdcs5_direct_candidate": row["selected"]["cdcs5"],
+            "cdcs2_direct_waveform": caches["cdcs2"][1][trial_id],
+            "cdcs5_direct_waveform": caches["cdcs5"][1][trial_id],
         })
         for pool in POOLS:
             alignment.append({

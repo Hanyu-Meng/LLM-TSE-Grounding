@@ -24,15 +24,15 @@ RESULTS = ROOT / "results/selected_evidence_test"
 EXPECTED = 6000
 SYSTEMS = OrderedDict([
     ("Primary WeSep", "primary_wesep"),
-    ("Pool B Selected Candidate", "pool_b_selected"),
-    ("Pool D Selected Candidate", "pool_d_selected"),
-    ("Pool D Selected S3 Recon", "pool_d_s3_recon"),
-    ("Original Q-Full UD", "original_qfull_ud"),
-    ("Original Q-Full + CSG", "original_qfull_csg"),
-    ("Pool B Selected -> Q-Full UD", "pool_b_qfull_ud"),
-    ("Pool B Selected -> Q-Full + CSG", "pool_b_qfull_csg"),
-    ("Pool D Selected -> Q-Full UD", "pool_d_qfull_ud"),
-    ("Pool D Selected -> Q-Full + CSG", "pool_d_qfull_csg"),
+    ("CDCS-2 direct", "cdcs2_direct"),
+    ("CDCS-5 direct", "cdcs5_direct"),
+    ("CDCS-5 S3 reconstruction", "cdcs5_s3_recon"),
+    ("Qwen-TSE UD (Primary evidence)", "qwen_tse_ud_primary"),
+    ("Qwen-TSE fixed CSG (Primary evidence)", "qwen_tse_fixed_csg_primary"),
+    ("Qwen-TSE UD (CDCS-2 evidence)", "qwen_tse_ud_cdcs2"),
+    ("Qwen-TSE fixed CSG (CDCS-2 evidence)", "qwen_tse_fixed_csg_cdcs2"),
+    ("Qwen-TSE UD (CDCS-5 evidence)", "qwen_tse_ud_cdcs5"),
+    ("Qwen-TSE fixed CSG (CDCS-5 evidence)", "qwen_tse_fixed_csg_cdcs5"),
 ])
 REQUIRED_FINITE = (
     "target_WER", "speaker_margin", "dnsmos_p808", "sim_target",
@@ -185,9 +185,9 @@ def main() -> int:
     checks["all_200_core_summary_cells_recompute"] = not summary_mismatches
 
     selector_names = {
-        "Primary WeSep": "pool_full",
-        "Pool B Selected Candidate": "pool_b",
-        "Pool D Selected Candidate": "pool_d",
+        "Primary WeSep": "primary",
+        "CDCS-2 direct": "cdcs2",
+        "CDCS-5 direct": "cdcs5",
     }
     candidate_rates: dict[str, dict[str, float]] = {}
     selector_mismatches = 0
@@ -208,29 +208,29 @@ def main() -> int:
     checks["persisted_candidate_choices_match_frozen_selector"] = selector_mismatches == 0
 
     primary = rows_by_name["Primary WeSep"]
-    pool_d = rows_by_name["Pool D Selected Candidate"]
+    cdcs5 = rows_by_name["CDCS-5 direct"]
     primary_wer = float(np.mean([float(primary[trial_id]["target_WER"]) for trial_id in ids]))
-    pool_d_wer = float(np.mean([float(pool_d[trial_id]["target_WER"]) for trial_id in ids]))
+    cdcs5_wer = float(np.mean([float(cdcs5[trial_id]["target_WER"]) for trial_id in ids]))
     differences = np.asarray([
-        float(pool_d[trial_id]["target_WER"]) - float(primary[trial_id]["target_WER"])
+        float(cdcs5[trial_id]["target_WER"]) - float(primary[trial_id]["target_WER"])
         for trial_id in ids
     ])
     ci_low, ci_high = bootstrap_ci(differences)
     confirmation = json.loads((RESULTS / "confirmatory_replication.json").read_text(encoding="utf-8"))
-    swap_rate = candidate_rates["Pool D Selected Candidate"]["natural_primary_swap"]
-    control_regression = 1.0 - candidate_rates["Pool D Selected Candidate"]["primary_correct_control"]
+    swap_rate = candidate_rates["CDCS-5 direct"]["natural_primary_swap"]
+    control_regression = 1.0 - candidate_rates["CDCS-5 direct"]["primary_correct_control"]
     checks.update({
         "primary_wer_matches_confirmation": math.isclose(
-            primary_wer, confirmation["primary_vs_pool_d_target_wer"]["base_mean"], abs_tol=1e-12
+            primary_wer, confirmation["primary_vs_cdcs5_target_wer"]["base_mean"], abs_tol=1e-12
         ),
-        "pool_d_wer_matches_confirmation": math.isclose(
-            pool_d_wer, confirmation["primary_vs_pool_d_target_wer"]["new_mean"], abs_tol=1e-12
+        "cdcs5_wer_matches_confirmation": math.isclose(
+            cdcs5_wer, confirmation["primary_vs_cdcs5_target_wer"]["new_mean"], abs_tol=1e-12
         ),
         "swap_rate_matches_confirmation": math.isclose(
-            swap_rate, confirmation["pool_d_swap_target_correct_rate"], abs_tol=1e-12
+            swap_rate, confirmation["cdcs5_swap_target_correct_rate"], abs_tol=1e-12
         ),
         "control_regression_matches_confirmation": math.isclose(
-            control_regression, confirmation["pool_d_control_wrong_speaker_regression_rate"], abs_tol=1e-12
+            control_regression, confirmation["cdcs5_control_wrong_speaker_regression_rate"], abs_tol=1e-12
         ),
         "independent_bootstrap_ci_excludes_zero": ci_high < 0.0,
     })
@@ -246,14 +246,14 @@ def main() -> int:
         "candidate_target_correct_rates": candidate_rates,
         "independent_headline_recomputation": {
             "primary_target_wer": primary_wer,
-            "pool_d_target_wer": pool_d_wer,
-            "absolute_difference_new_minus_base": pool_d_wer - primary_wer,
+            "cdcs5_target_wer": cdcs5_wer,
+            "absolute_difference_new_minus_base": cdcs5_wer - primary_wer,
             "independent_bootstrap_resamples": 20_000,
             "independent_bootstrap_seed": 20260819,
             "independent_ci95_low": ci_low,
             "independent_ci95_high": ci_high,
-            "pool_d_swap_target_correct_rate": swap_rate,
-            "pool_d_control_wrong_speaker_regression_rate": control_regression,
+            "cdcs5_swap_target_correct_rate": swap_rate,
+            "cdcs5_control_wrong_speaker_regression_rate": control_regression,
         },
     }
     atomic_json(RESULTS / "data_quality_audit.json", output)

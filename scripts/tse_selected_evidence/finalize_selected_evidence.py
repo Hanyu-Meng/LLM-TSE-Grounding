@@ -2,7 +2,7 @@
 """Validate completed selected-evidence caches and build frozen DEV manifests.
 
 This step never runs an extractor or tokenizer.  It only accepts exact,
-complete Pool B and Pool D caches and then materializes the leak-free inference
+complete CDCS-2 and CDCS-5 caches and then materializes the leak-free inference
 manifest plus the separate evaluation-only manifest.
 """
 
@@ -27,8 +27,8 @@ PREPARED = ROOT / "manifests/tse_dev_prepared.jsonl"
 SMOKE = ANALYSIS / "preregistered_smoke_subset.json"
 ORDER = ("full", "first", "middle", "final", "tfmap_context_full")
 POOLS = {
-    "pool_b": ("full", "tfmap_context_full"),
-    "pool_d": ORDER,
+    "cdcs2": ("full", "tfmap_context_full"),
+    "cdcs5": ORDER,
 }
 FORBIDDEN = (
     "target", "interferer", "transcript", "sisdr", "si_sdr", "qc",
@@ -165,10 +165,10 @@ def main() -> int:
             "mixture_wav": row["mixture_wav"],
             "enrollment_wav": row["enrollment_wav"],
             "speaker_embedding_path": row["speaker_embedding_path"],
-            "pool_b_evidence_token_path": cache["pool_b"][0][trial_id],
-            "pool_d_evidence_token_path": cache["pool_d"][0][trial_id],
-            "pool_b_selected_candidate": row["selected"]["pool_b"],
-            "pool_d_selected_candidate": row["selected"]["pool_d"],
+            "cdcs2_evidence_token_path": cache["cdcs2"][0][trial_id],
+            "cdcs5_evidence_token_path": cache["cdcs5"][0][trial_id],
+            "cdcs2_direct_candidate": row["selected"]["cdcs2"],
+            "cdcs5_direct_candidate": row["selected"]["cdcs5"],
         }
         leaked = sorted(
             key for key in inference_row
@@ -179,10 +179,10 @@ def main() -> int:
         inference.append(inference_row)
         evaluation.append(dict(prepared[trial_id]) | {
             "cohort": row["cohort"],
-            "pool_b_selected_candidate": row["selected"]["pool_b"],
-            "pool_d_selected_candidate": row["selected"]["pool_d"],
-            "pool_b_selected_waveform": cache["pool_b"][1][trial_id],
-            "pool_d_selected_waveform": cache["pool_d"][1][trial_id],
+            "cdcs2_direct_candidate": row["selected"]["cdcs2"],
+            "cdcs5_direct_candidate": row["selected"]["cdcs5"],
+            "cdcs2_direct_waveform": cache["cdcs2"][1][trial_id],
+            "cdcs5_direct_waveform": cache["cdcs5"][1][trial_id],
         })
         for pool in POOLS:
             alignment.append({

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Evaluation-only Pool B/D noisy candidate analysis and SNR figure."""
+"""Evaluation-only CDCS-2/CDCS-5 noisy candidate analysis and SNR figure."""
 
 from __future__ import annotations
 
@@ -17,8 +17,8 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
 ORDER = ("full", "first", "middle", "final", "tfmap_context_full")
-POOL_B = ("full", "tfmap_context_full")
-POOL_D = ORDER
+CDCS2_CANDIDATES = ("full", "tfmap_context_full")
+CDCS5_CANDIDATES = ORDER
 
 
 def parse_args() -> argparse.Namespace:
@@ -77,15 +77,15 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "primary_noisy_swap_rate": len(swaps) / len(rows) if rows else None,
         "primary_noisy_correct_control_count": len(controls),
         "primary_noisy_correct_control_rate": len(controls) / len(rows) if rows else None,
-        "selection_counts_pool_b": dict(Counter(row["pool_b_selected"] for row in rows)),
-        "selection_counts_pool_d": dict(Counter(row["pool_d_selected"] for row in rows)),
+        "selection_counts_cdcs2": dict(Counter(row["cdcs2_direct"] for row in rows)),
+        "selection_counts_cdcs5": dict(Counter(row["cdcs5_direct"] for row in rows)),
     }
     for name in ORDER:
         result[f"{name}_target_correct_rate"] = rate(rows, f"{name}_target_correct")
         result[f"{name}_recovery_rate_on_primary_swaps"] = rate(
             swaps, f"{name}_target_correct"
         )
-    for pool in ("pool_b", "pool_d"):
+    for pool in ("cdcs2", "cdcs5"):
         result[f"{pool}_selected_target_correct_rate"] = rate(
             rows, f"{pool}_selected_target_correct"
         )
@@ -106,19 +106,19 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
         result[f"{pool}_selector_gap_on_primary_swaps"] = (
             oracle - selected if oracle is not None and selected is not None else None
         )
-    result["pool_d_tfmap_recovery_share"] = (
+    result["cdcs5_tfmap_recovery_share"] = (
         float(np.mean([
-            row["pool_d_selected"] == "tfmap_context_full"
-            for row in swaps if row["pool_d_selected_target_correct"]
+            row["cdcs5_direct"] == "tfmap_context_full"
+            for row in swaps if row["cdcs5_direct_target_correct"]
         ]))
-        if any(row["pool_d_selected_target_correct"] for row in swaps) else None
+        if any(row["cdcs5_direct_target_correct"] for row in swaps) else None
     )
-    result["pool_d_segment_recovery_share"] = (
+    result["cdcs5_segment_recovery_share"] = (
         float(np.mean([
-            row["pool_d_selected"] in {"first", "middle", "final"}
-            for row in swaps if row["pool_d_selected_target_correct"]
+            row["cdcs5_direct"] in {"first", "middle", "final"}
+            for row in swaps if row["cdcs5_direct_target_correct"]
         ]))
-        if any(row["pool_d_selected_target_correct"] for row in swaps) else None
+        if any(row["cdcs5_direct_target_correct"] for row in swaps) else None
     )
     # Mutually interpretable recovery sources on the primary-swap cohort.
     # "Overlap" deliberately means cross-family overlap (TF-map and at least
@@ -134,11 +134,11 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
         tfmap_only.append(tfmap and not full and not segment)
         segment_only.append(segment and not full and not tfmap)
         overlap.append(tfmap and segment)
-    result["pool_d_tfmap_only_recovery_rate_on_primary_swaps"] = mean_bool(tfmap_only)
-    result["pool_d_segment_only_recovery_rate_on_primary_swaps"] = mean_bool(segment_only)
-    result["pool_d_tfmap_segment_overlap_rate_on_primary_swaps"] = mean_bool(overlap)
-    result["pool_d_selected_joint_recovery_rate_on_primary_swaps"] = result[
-        "pool_d_selected_recovery_rate_on_primary_swaps"
+    result["cdcs5_tfmap_only_recovery_rate_on_primary_swaps"] = mean_bool(tfmap_only)
+    result["cdcs5_segment_only_recovery_rate_on_primary_swaps"] = mean_bool(segment_only)
+    result["cdcs5_tfmap_segment_overlap_rate_on_primary_swaps"] = mean_bool(overlap)
+    result["cdcs5_direct_joint_recovery_rate_on_primary_swaps"] = result[
+        "cdcs5_direct_recovery_rate_on_primary_swaps"
     ]
     return result
 
@@ -179,9 +179,9 @@ def plot_by_snr(rows: list[dict[str, Any]], prefix: Path) -> None:
         ("Middle", lambda row: row["middle_target_correct"]),
         ("Final", lambda row: row["final_target_correct"]),
         ("TF-map", lambda row: row["tfmap_context_full_target_correct"]),
-        ("Pool B", lambda row: row["pool_b_selected_target_correct"]),
-        ("Pool D cosine", lambda row: row["pool_d_selected_target_correct"]),
-        ("Pool D oracle", lambda row: row["pool_d_oracle_available"]),
+        ("CDCS-2", lambda row: row["cdcs2_direct_target_correct"]),
+        ("CDCS-5 cosine", lambda row: row["cdcs5_direct_target_correct"]),
+        ("CDCS-5 oracle", lambda row: row["cdcs5_oracle_available"]),
     )
     colors = (
         "#64748B", "#7C3AED", "#A855F7", "#D946EF",
@@ -226,14 +226,14 @@ def main() -> int:
         if tuple(candidates) != ORDER:
             raise ValueError(f"candidate order mismatch: {row['trial_id']}")
         primary = candidates["full"]
-        pool_b_selected = row["selected"]["pool_b"]
-        pool_d_selected = row["selected"]["pool_d"]
+        cdcs2_direct = row["selected"]["cdcs2"]
+        cdcs5_direct = row["selected"]["cdcs5"]
         oracle_b = max(
-            POOL_B,
+            CDCS2_CANDIDATES,
             key=lambda name: (float(candidates[name]["sisdr_margin_db"]), -ORDER.index(name)),
         )
         oracle_d = max(
-            POOL_D,
+            CDCS5_CANDIDATES,
             key=lambda name: (float(candidates[name]["sisdr_margin_db"]), -ORDER.index(name)),
         )
         trial = {
@@ -252,19 +252,23 @@ def main() -> int:
                 float(primary["sisdr_margin_db"]) >= 5.0
                 and float(primary["sisdr_target_db"]) > 0.0
             ),
-            "pool_b_selected": pool_b_selected,
-            "pool_d_selected": pool_d_selected,
-            "pool_b_oracle": oracle_b,
-            "pool_d_oracle": oracle_d,
-            "pool_b_selected_target_correct": bool(candidates[pool_b_selected]["target_correct"]),
-            "pool_d_selected_target_correct": bool(candidates[pool_d_selected]["target_correct"]),
-            "pool_b_oracle_available": any(candidates[name]["target_correct"] for name in POOL_B),
-            "pool_d_oracle_available": any(candidates[name]["target_correct"] for name in POOL_D),
-            "pool_b_selected_speaker_margin": float(
-                candidates[pool_b_selected]["speaker_embedding_margin"]
+            "cdcs2_direct": cdcs2_direct,
+            "cdcs5_direct": cdcs5_direct,
+            "cdcs2_oracle": oracle_b,
+            "cdcs5_oracle": oracle_d,
+            "cdcs2_direct_target_correct": bool(candidates[cdcs2_direct]["target_correct"]),
+            "cdcs5_direct_target_correct": bool(candidates[cdcs5_direct]["target_correct"]),
+            "cdcs2_oracle_available": any(
+                candidates[name]["target_correct"] for name in CDCS2_CANDIDATES
             ),
-            "pool_d_selected_speaker_margin": float(
-                candidates[pool_d_selected]["speaker_embedding_margin"]
+            "cdcs5_oracle_available": any(
+                candidates[name]["target_correct"] for name in CDCS5_CANDIDATES
+            ),
+            "cdcs2_direct_speaker_margin": float(
+                candidates[cdcs2_direct]["speaker_embedding_margin"]
+            ),
+            "cdcs5_direct_speaker_margin": float(
+                candidates[cdcs5_direct]["speaker_embedding_margin"]
             ),
             "test_used": args.split == "test",
         }
@@ -328,8 +332,8 @@ def main() -> int:
         "split": args.split,
         "trials": len(trials),
         "natural_primary_swap_rate": result["natural"]["primary_noisy_swap_rate"],
-        "pool_d_recovery": result["natural"]["pool_d_selected_recovery_rate_on_primary_swaps"],
-        "pool_d_oracle_recovery": result["natural"]["pool_d_oracle_recovery_rate_on_primary_swaps"],
+        "cdcs5_recovery": result["natural"]["cdcs5_direct_recovery_rate_on_primary_swaps"],
+        "cdcs5_oracle_recovery": result["natural"]["cdcs5_oracle_recovery_rate_on_primary_swaps"],
         "test_used": args.split == "test",
     }, indent=2))
     return 0

@@ -57,10 +57,10 @@ def validate_dev() -> dict:
     gnr_choice = read_json(ROOT / "analysis/noisy_wham/dev/full/gnr_selection.json")
     selected_gnr = gnr_choice["selected_dev_slug"]
     systems = (
-        "primary_wesep", "pool_d_selected", "pool_d_qfull_ud",
-        "pool_d_fixed_csg", "pool_d_adaptive_csg",
-        "pool_d_adaptive_csg_gnr_k50_r3",
-        "pool_d_adaptive_csg_gnr_k20_r2",
+        "primary_wesep", "cdcs5_direct", "qwen_tse_ud_cdcs5",
+        "qwen_tse_fixed_csg_cdcs5", "qwen_tse_adaptive_csg_cdcs5",
+        "qwen_tse_adaptive_csg_gnr_cdcs5_k50_r3",
+        "qwen_tse_adaptive_csg_gnr_cdcs5_k20_r2",
     )
     for system in systems:
         path = ROOT / f"results/noisy_wham/dev/systems/{system}/summary.json"
@@ -68,10 +68,10 @@ def validate_dev() -> dict:
         if value.get("status") != "COMPLETE" or value.get("expected") != 8400 or value.get("test_used"):
             raise ValueError(f"DEV core system incomplete: {system}")
     diagnostics = (
-        "pool_d_grid_l0_w0", "pool_d_grid_l0p25_w0", "pool_d_grid_l0p5_w0",
-        "pool_d_grid_l1_w0", "pool_d_grid_l1p5_w0", "pool_d_grid_l2_w0",
-        "pool_d_source_csg_w0", "pool_d_source_csg_w1",
-        "pool_d_tse_calibrated_csg", "pool_d_oracle_snr_csg",
+        "cdcs5_grid_l0_w0", "cdcs5_grid_l0p25_w0", "cdcs5_grid_l0p5_w0",
+        "cdcs5_grid_l1_w0", "cdcs5_grid_l1p5_w0", "cdcs5_grid_l2_w0",
+        "cdcs5_source_csg_w0", "cdcs5_source_csg_w1",
+        "cdcs5_tse_calibrated_csg", "cdcs5_oracle_snr_csg",
     )
     for system in diagnostics:
         value = read_json(ROOT / f"results/noisy_wham/dev/systems/{system}/summary.json")
@@ -79,8 +79,8 @@ def validate_dev() -> dict:
             raise ValueError(f"DEV adaptive diagnostic incomplete: {system}")
     metrics = ("duration_estoi", "utmos", "speechbertscore", "lps")
     extended_systems = (
-        "primary_wesep", "pool_d_selected", "pool_d_qfull_ud",
-        "pool_d_fixed_csg", "pool_d_adaptive_csg", selected_gnr,
+        "primary_wesep", "cdcs5_direct", "qwen_tse_ud_cdcs5",
+        "qwen_tse_fixed_csg_cdcs5", "qwen_tse_adaptive_csg_cdcs5", selected_gnr,
     )
     for metric in metrics:
         for system in extended_systems:
@@ -124,7 +124,7 @@ def validate_dev() -> dict:
         "analysis/noisy_wham/dev/full/adaptive/frozen_adaptive_dev_choice.json",
         "analysis/noisy_wham/dev/full/gnr_selection.json",
         "analysis/noisy_wham/dev/full/best_generative_selection.json",
-        "analysis/noisy_wham/dev/noisy_qfull_tail_bank.json",
+        "analysis/noisy_wham/dev/noisy_qwen_tse_tail_bank.json",
     ):
         value = read_json(ROOT / required)
         if value.get("test_used") or value.get("status") not in {
@@ -177,9 +177,9 @@ def validate_compute_optimizations() -> dict:
     # Runtime checks are emitted by the actual full-DEV processes. Whenever a
     # cache is exercised, require every configured fail-closed spot check.
     for system in (
-        "pool_d_adaptive_csg",
-        "pool_d_adaptive_csg_gnr_k20_r2",
-        "pool_d_adaptive_csg_gnr_k50_r3",
+        "qwen_tse_adaptive_csg_cdcs5",
+        "qwen_tse_adaptive_csg_gnr_cdcs5_k20_r2",
+        "qwen_tse_adaptive_csg_gnr_cdcs5_k50_r3",
     ):
         summary = read_json(
             ROOT / f"results/noisy_wham/dev/systems/{system}/audio_summary.json"
@@ -293,7 +293,7 @@ def frozen_paths() -> list[Path]:
         ROOT / "analysis/noisy_wham/protocol_amendment_v4_gnr_runtime_audit.json",
         ROOT / "analysis/noisy_wham/protocol_amendment_v5_gnr_mechanism_target_tokens.json",
         ROOT / "analysis/noisy_wham/protocol_amendment_v6_reference_cache_gate.json",
-        ROOT / "analysis/noisy_wham/dev/noisy_qfull_tail_bank.json",
+        ROOT / "analysis/noisy_wham/dev/noisy_qwen_tse_tail_bank.json",
         ROOT / "analysis/noisy_wham/metric_asset_audit.json",
         ROOT / "analysis/noisy_wham/optimization_audit/compute_reuse_audit.json",
         ROOT / "analysis/noisy_wham/optimization_audit/extended_reference_cache_hit_audit_v2.json",
@@ -316,7 +316,7 @@ def frozen_paths() -> list[Path]:
         ROOT / "analysis/noisy_wham/dev/full/gnr_mechanism_v2/failures.jsonl",
         ROOT / "manifests/tse_dev_prepared.jsonl",
         ROOT / "docs/GNR_TSE_IMPLEMENTATION_AUDIT.md",
-        ROOT / "experiments/qfull_sme_rawqwen_seed0_20260810_0858/checkpoints/best.pt",
+        ROOT / "experiments/qwen_tse_sme_rawqwen_seed0_20260810_0858/checkpoints/best.pt",
         ROOT / "pretrained/wesep/spk_emb_100/avg_model.pt",
         ROOT / "pretrained/wesep/spk_emb_100/config.yaml",
         ROOT / "pretrained/wesep/tfmap_context_100/avg_model.pt",
@@ -475,7 +475,7 @@ def main() -> int:
         "tail_protocol": {
             "dev_ids_frozen": True,
             "test_algorithm_frozen_before_test": True,
-            "ranking": "natural Pool-D Q-Full UD raw WER descending, trial_id tie-break",
+            "ranking": "natural Qwen-TSE UD (CDCS-5 evidence) raw WER descending, trial_id tie-break",
             "sets": [50, 100, 200, "10_percent"],
         },
     }

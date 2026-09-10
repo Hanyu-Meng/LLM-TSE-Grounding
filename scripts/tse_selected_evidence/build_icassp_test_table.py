@@ -37,40 +37,40 @@ SYSTEMS: OrderedDict[str, dict[str, Any]] = OrderedDict([
         "path": SYSTEM_ROOT / "primary_wesep/per_trial_metrics.jsonl",
         "pool": "full", "kind": "deterministic",
     }),
-    ("Pool B Selected Candidate", {
-        "path": SYSTEM_ROOT / "pool_b_selected/per_trial_metrics.jsonl",
+    ("CDCS-2 direct", {
+        "path": SYSTEM_ROOT / "cdcs2_direct/per_trial_metrics.jsonl",
         "pool": "full+tfmap_context_full", "kind": "deterministic",
     }),
-    ("Pool D Selected Candidate", {
-        "path": SYSTEM_ROOT / "pool_d_selected/per_trial_metrics.jsonl",
+    ("CDCS-5 direct", {
+        "path": SYSTEM_ROOT / "cdcs5_direct/per_trial_metrics.jsonl",
         "pool": "all five", "kind": "deterministic",
     }),
-    ("Pool D Selected S3 Recon", {
-        "path": SYSTEM_ROOT / "pool_d_s3_recon/per_trial_metrics.jsonl",
+    ("CDCS-5 S3 reconstruction", {
+        "path": SYSTEM_ROOT / "cdcs5_s3_recon/per_trial_metrics.jsonl",
         "pool": "all five", "kind": "codec_control",
     }),
-    ("Original Q-Full UD", {
-        "path": SYSTEM_ROOT / "original_qfull_ud/per_trial_metrics.jsonl",
+    ("Qwen-TSE UD (Primary evidence)", {
+        "path": SYSTEM_ROOT / "qwen_tse_ud_primary/per_trial_metrics.jsonl",
         "pool": "full", "kind": "generative",
     }),
-    ("Original Q-Full + CSG", {
-        "path": SYSTEM_ROOT / "original_qfull_csg/per_trial_metrics.jsonl",
+    ("Qwen-TSE fixed CSG (Primary evidence)", {
+        "path": SYSTEM_ROOT / "qwen_tse_fixed_csg_primary/per_trial_metrics.jsonl",
         "pool": "full", "kind": "generative",
     }),
-    ("Pool B Selected -> Q-Full UD", {
-        "path": SYSTEM_ROOT / "pool_b_qfull_ud/per_trial_metrics.jsonl",
+    ("Qwen-TSE UD (CDCS-2 evidence)", {
+        "path": SYSTEM_ROOT / "qwen_tse_ud_cdcs2/per_trial_metrics.jsonl",
         "pool": "full+tfmap_context_full", "kind": "generative",
     }),
-    ("Pool B Selected -> Q-Full + CSG", {
-        "path": SYSTEM_ROOT / "pool_b_qfull_csg/per_trial_metrics.jsonl",
+    ("Qwen-TSE fixed CSG (CDCS-2 evidence)", {
+        "path": SYSTEM_ROOT / "qwen_tse_fixed_csg_cdcs2/per_trial_metrics.jsonl",
         "pool": "full+tfmap_context_full", "kind": "generative",
     }),
-    ("Pool D Selected -> Q-Full UD", {
-        "path": SYSTEM_ROOT / "pool_d_qfull_ud/per_trial_metrics.jsonl",
+    ("Qwen-TSE UD (CDCS-5 evidence)", {
+        "path": SYSTEM_ROOT / "qwen_tse_ud_cdcs5/per_trial_metrics.jsonl",
         "pool": "all five", "kind": "generative",
     }),
-    ("Pool D Selected -> Q-Full + CSG", {
-        "path": SYSTEM_ROOT / "pool_d_qfull_csg/per_trial_metrics.jsonl",
+    ("Qwen-TSE fixed CSG (CDCS-5 evidence)", {
+        "path": SYSTEM_ROOT / "qwen_tse_fixed_csg_cdcs5/per_trial_metrics.jsonl",
         "pool": "all five", "kind": "generative",
     }),
 ])
@@ -211,27 +211,27 @@ def main() -> int:
     qwen, csg = core.decide_values(frozen_summaries, frozen_paired)
     recommended = core.choose_system(frozen_summaries, qwen, csg)
 
-    pool_d = summaries["Pool D Selected Candidate"]
-    pool_b = summaries["Pool B Selected Candidate"]
+    cdcs5 = summaries["CDCS-5 direct"]
+    cdcs2 = summaries["CDCS-2 direct"]
     primary_full = summaries["Primary WeSep"]["full_test"]
-    d_full = pool_d["full_test"]
-    swap = pool_d["natural_primary_swap"]
-    control = pool_d["primary_correct_control"]
+    d_full = cdcs5["full_test"]
+    swap = cdcs5["natural_primary_swap"]
+    control = cdcs5["primary_correct_control"]
     rng = np.random.default_rng(1986 + 991)
     replication_wer = core.continuous_test(
         np.asarray([primary[trial_id]["target_WER"] for trial_id in ids], dtype=float),
-        np.asarray([systems["Pool D Selected Candidate"][trial_id]["target_WER"] for trial_id in ids], dtype=float),
+        np.asarray([systems["CDCS-5 direct"][trial_id]["target_WER"] for trial_id in ids], dtype=float),
         rng,
     )
     criteria = {
-        "pool_d_wer_lower_ci_excludes_zero": (
+        "cdcs5_wer_lower_ci_excludes_zero": (
             replication_wer["absolute_difference_new_minus_base"] < 0
             and replication_wer["ci95_high"] < 0
         ),
-        "pool_d_content_switch_no_higher": d_full["content_switch_rate"] <= primary_full["content_switch_rate"],
-        "pool_d_acoustic_switch_no_higher": d_full["acoustic_switch_rate"] <= primary_full["acoustic_switch_rate"],
-        "pool_d_swap_target_correct_at_least_75pct": swap["candidate_target_correct_rate"] >= 0.75,
-        "pool_d_control_wrong_speaker_regression_at_most_0p5pct": (
+        "cdcs5_content_switch_no_higher": d_full["content_switch_rate"] <= primary_full["content_switch_rate"],
+        "cdcs5_acoustic_switch_no_higher": d_full["acoustic_switch_rate"] <= primary_full["acoustic_switch_rate"],
+        "cdcs5_swap_target_correct_at_least_75pct": swap["candidate_target_correct_rate"] >= 0.75,
+        "cdcs5_control_wrong_speaker_regression_at_most_0p5pct": (
             1.0 - control["candidate_target_correct_rate"] <= 0.005
         ),
         "all_ten_systems_exact_6000_zero_failure": True,
@@ -252,9 +252,9 @@ def main() -> int:
     atomic_json(RESULTS / "paired_comparisons.json", paired)
     atomic_json(RESULTS / "confirmatory_replication.json", {
         "status": replication, "criteria": criteria,
-        "primary_vs_pool_d_target_wer": replication_wer,
-        "pool_d_swap_target_correct_rate": swap["candidate_target_correct_rate"],
-        "pool_d_control_wrong_speaker_regression_rate": 1.0 - control["candidate_target_correct_rate"],
+        "primary_vs_cdcs5_target_wer": replication_wer,
+        "cdcs5_swap_target_correct_rate": swap["candidate_target_correct_rate"],
+        "cdcs5_control_wrong_speaker_regression_rate": 1.0 - control["candidate_target_correct_rate"],
         "qwen_additional_value": qwen, "csg_additional_value": csg,
         "frozen_recommended_system_on_test_metrics": recommended,
         "test_used": True, "post_test_tuning_authorized": False,
@@ -312,7 +312,7 @@ def main() -> int:
         "",
         markdown_table(["Pre-registered criterion", "Result"], criterion_rows),
         "",
-        f"Primary-to-Pool-D WER difference is {replication_wer['absolute_difference_new_minus_base']:.4f} with paired 95% CI [{replication_wer['ci95_low']:.4f}, {replication_wer['ci95_high']:.4f}]. Pool D recovers {percent(swap['candidate_target_correct_rate'])} of 398 frozen primary swaps; its candidate wrong-speaker regression on 5,588 controls is {percent(1.0 - control['candidate_target_correct_rate'], 4)}.",
+        f"Primary-to-CDCS-5 WER difference is {replication_wer['absolute_difference_new_minus_base']:.4f} with paired 95% CI [{replication_wer['ci95_low']:.4f}, {replication_wer['ci95_high']:.4f}]. CDCS-5 recovers {percent(swap['candidate_target_correct_rate'])} of 398 frozen primary swaps; its candidate wrong-speaker regression on 5,588 controls is {percent(1.0 - control['candidate_target_correct_rate'], 4)}.",
         "",
         "## Full natural TEST (6,000 trials)",
         "",
@@ -343,11 +343,11 @@ def main() -> int:
         "",
         "## Candidate availability and safety",
         "",
-        f"Pool B target-correct candidate availability on primary swaps is {percent(pool_b['natural_primary_swap']['candidate_target_correct_rate'])}; Pool D is {percent(swap['candidate_target_correct_rate'])}. Selection uses only the complete target enrollment and frozen candidate audio. Clean targets, interferers, transcripts, SI-SDR, WER, and cohort labels are evaluation-only and never enter candidate construction or selection.",
+        f"CDCS-2 target-correct candidate availability on primary swaps is {percent(cdcs2['natural_primary_swap']['candidate_target_correct_rate'])}; CDCS-5 is {percent(swap['candidate_target_correct_rate'])}. Selection uses only the complete target enrollment and frozen candidate audio. Clean targets, interferers, transcripts, SI-SDR, WER, and cohort labels are evaluation-only and never enter candidate construction or selection.",
         "",
         "## Interpretation",
         "",
-        f"The frozen DEV mainline is **{'confirmed on TEST' if replication == 'PASS' else 'not fully confirmed on TEST'}** under the pre-registered conjunction. This result must be reported as-is. It does not reopen candidate design, selector training, Q-Full checkpoint selection, or CSG tuning.",
+        f"The frozen DEV mainline is **{'confirmed on TEST' if replication == 'PASS' else 'not fully confirmed on TEST'}** under the pre-registered conjunction. This result must be reported as-is. It does not reopen candidate design, selector training, Qwen-TSE checkpoint selection, or CSG tuning.",
         "",
         "## Reproducibility",
         "",
@@ -362,10 +362,10 @@ def main() -> int:
     atomic_text(ROOT / "docs/ICASSP2027_SELECTED_EVIDENCE_TEST_REPORT.md", report)
     terminal = {
         "FULL_TEST_COMPLETE": "YES", "CONFIRMATORY_REPLICATION": replication,
-        "POOL_D_SWAP_TARGET_CORRECT": swap["candidate_target_correct_rate"],
-        "POOL_D_CONTROL_WRONG_SPEAKER_REGRESSION": 1.0 - control["candidate_target_correct_rate"],
+        "CDCS5_SWAP_TARGET_CORRECT": swap["candidate_target_correct_rate"],
+        "CDCS5_CONTROL_WRONG_SPEAKER_REGRESSION": 1.0 - control["candidate_target_correct_rate"],
         "PRIMARY_TARGET_WER": primary_full["target_wer"],
-        "POOL_D_SELECTED_TARGET_WER": d_full["target_wer"],
+        "CDCS5_DIRECT_TARGET_WER": d_full["target_wer"],
         "QWEN_ADDITIONAL_VALUE": qwen, "CSG_ADDITIONAL_VALUE": csg,
         "RECOMMENDED_SYSTEM_BY_FROZEN_RULE": recommended,
         "TEST_USED": "YES", "POST_TEST_TUNING": "NO",

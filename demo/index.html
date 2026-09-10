@@ -55,7 +55,7 @@
           <p class="panel-kicker">Frozen clean TEST · 6,000 trials</p>
           <div class="hero-metric">
             <strong>89.20<span>%</span></strong>
-            <p>primary speaker confusions repaired by deployable Pool D selection</p>
+            <p>primary speaker confusions repaired by deployable CDCS-5 selection</p>
           </div>
           <div class="metric-rule"></div>
           <div class="metric-pair">
@@ -113,8 +113,8 @@
           <div class="pipeline-node select"><small>Target consistency</small><strong>ECAPA cosine selection</strong><span>no clean reference</span></div>
           <span class="arrow">→</span>
           <div class="pipeline-fork">
-            <div class="pipeline-node direct"><small>Fidelity endpoint</small><strong>Pool D direct</strong></div>
-            <div class="pipeline-node ground"><small>Generative endpoint</small><strong>Q-Full + CSG / GNR</strong></div>
+            <div class="pipeline-node direct"><small>Fidelity endpoint</small><strong>CDCS-5 direct</strong></div>
+            <div class="pipeline-node ground"><small>Generative endpoint</small><strong>Qwen-TSE fixed CSG / GNR</strong></div>
           </div>
         </div>
       </section>
@@ -142,7 +142,7 @@
         <div class="evidence-cards">
           <article>
             <p class="mini-label">Recovery</p><strong>355 / 398</strong>
-            <p>Clean TEST primary swaps repaired by Pool D.</p>
+            <p>Clean TEST primary swaps repaired by CDCS-5.</p>
           </article>
           <article>
             <p class="mini-label">Near-oracle</p><strong>360 / 398</strong>
@@ -150,7 +150,7 @@
           </article>
           <article>
             <p class="mini-label">Generation control</p><strong>14.08 → 12.74</strong>
-            <p>Clean TEST WER for Q-Full UD → CSG on identical selected evidence.</p>
+            <p>Clean TEST WER for Qwen-TSE UD → CSG on identical selected evidence.</p>
           </article>
         </div>
       </section>
@@ -176,7 +176,7 @@
             <div class="audio-item ref-audio"><span>Clean target <i>eval only</i></span><audio controls preload="none" src="public/assets/audio/clean/segmented/target.wav"></audio></div>
             <div class="audio-item ref-audio"><span>Interferer <i>eval only</i></span><audio controls preload="none" src="public/assets/audio/clean/segmented/interferer.wav"></audio></div>
             <div class="audio-item bad-audio"><span>Primary / full <i>wrong speaker</i></span><audio controls preload="none" src="public/assets/audio/clean/segmented/primary.wav"></audio></div>
-            <div class="audio-item good-audio"><span>Pool D / middle <i>selected</i></span><audio controls preload="none" src="public/assets/audio/clean/segmented/pool-d.wav"></audio></div>
+            <div class="audio-item good-audio"><span>CDCS-5 / middle <i>selected</i></span><audio controls preload="none" src="public/assets/audio/clean/segmented/cdcs5-direct.wav"></audio></div>
           </div>
           <details><summary>Show spectrogram comparison</summary><img src="public/assets/figures/clean-case-segmented.png" alt="Spectrogram comparison for the enrollment-view recovery case" /></details>
         </article>
@@ -195,7 +195,7 @@
             <div class="audio-item ref-audio"><span>Clean target <i>eval only</i></span><audio controls preload="none" src="public/assets/audio/clean/tfmap/target.wav"></audio></div>
             <div class="audio-item ref-audio"><span>Interferer <i>eval only</i></span><audio controls preload="none" src="public/assets/audio/clean/tfmap/interferer.wav"></audio></div>
             <div class="audio-item bad-audio"><span>Primary / full <i>wrong speaker</i></span><audio controls preload="none" src="public/assets/audio/clean/tfmap/primary.wav"></audio></div>
-            <div class="audio-item good-audio"><span>Pool D / TF-map <i>selected</i></span><audio controls preload="none" src="public/assets/audio/clean/tfmap/pool-d.wav"></audio></div>
+            <div class="audio-item good-audio"><span>CDCS-5 / TF-map <i>selected</i></span><audio controls preload="none" src="public/assets/audio/clean/tfmap/cdcs5-direct.wav"></audio></div>
           </div>
           <details><summary>Show spectrogram comparison</summary><img src="public/assets/figures/clean-case-tfmap.png" alt="Spectrogram comparison for the TF-map-only recovery case" /></details>
         </article>
@@ -203,17 +203,17 @@
         <article class="audio-story">
           <div class="story-copy">
             <p class="story-number">Case 03 · constrained grounding</p>
-            <h3>Correct evidence enters Q-Full. CSG reduces decoder drift—but direct evidence remains strongest.</h3>
+            <h3>Correct evidence enters Qwen-TSE. CSG reduces decoder drift—but direct evidence remains strongest.</h3>
             <p class="quote target">Target: “I like you still, Rachel. I’m sure I’ll always like you.”</p>
             <div class="case-delta"><span>UD WER <b>27.3%</b></span><span>CSG WER <b>9.1%</b></span><span>Direct <b>0%</b></span></div>
           </div>
           <div class="audio-grid four">
             <div class="audio-item ref-audio"><span>Clean target <i>eval only</i></span><audio controls preload="none" src="public/assets/audio/clean/csg/target.wav"></audio></div>
-            <div class="audio-item good-audio"><span>Pool D evidence <i>direct</i></span><audio controls preload="none" src="public/assets/audio/clean/csg/pool-d.wav"></audio></div>
-            <div class="audio-item bad-audio"><span>Q-Full UD <i>unconstrained</i></span><audio controls preload="none" src="public/assets/audio/clean/csg/ud.wav"></audio></div>
-            <div class="audio-item csg-audio"><span>Q-Full + CSG <i>grounded</i></span><audio controls preload="none" src="public/assets/audio/clean/csg/csg.wav"></audio></div>
+            <div class="audio-item good-audio"><span>CDCS-5 evidence <i>direct</i></span><audio controls preload="none" src="public/assets/audio/clean/csg/cdcs5-direct.wav"></audio></div>
+            <div class="audio-item bad-audio"><span>Qwen-TSE UD <i>unconstrained</i></span><audio controls preload="none" src="public/assets/audio/clean/csg/ud.wav"></audio></div>
+            <div class="audio-item csg-audio"><span>Qwen-TSE fixed CSG <i>grounded</i></span><audio controls preload="none" src="public/assets/audio/clean/csg/csg.wav"></audio></div>
           </div>
-          <details><summary>Show spectrogram comparison</summary><img src="public/assets/figures/clean-case-csg.png" alt="Spectrogram comparison for Q-Full UD and constrained grounding" /></details>
+          <details><summary>Show spectrogram comparison</summary><img src="public/assets/figures/clean-case-csg.png" alt="Spectrogram comparison for Qwen-TSE UD and constrained grounding" /></details>
         </article>
 
         <div class="pending-audio">
@@ -229,8 +229,8 @@
         </div>
         <div class="chart-layout">
           <div class="chart-card">
-            <div class="chart-head"><div><h3>Candidate recovery by controlled SNR</h3><p id="snr-subtitle">Frozen DEV analysis, 480 paired trials at each SNR.</p></div><div class="legend"><span class="teal">Pool D selected</span><span class="gold">Pool D oracle</span></div></div>
-            <canvas id="snr-chart" width="920" height="430" aria-label="Pool D selected and oracle recovery rate across SNR"></canvas>
+            <div class="chart-head"><div><h3>Candidate recovery by controlled SNR</h3><p id="snr-subtitle">Frozen DEV analysis, 480 paired trials at each SNR.</p></div><div class="legend"><span class="teal">CDCS-5 selected</span><span class="gold">CDCS-5 oracle</span></div></div>
+            <canvas id="snr-chart" width="920" height="430" aria-label="CDCS-5 selected and oracle recovery rate across SNR"></canvas>
           </div>
           <aside class="robustness-note">
             <p class="mini-label">Interpretation</p>
@@ -244,13 +244,13 @@
           <div><p class="eyebrow">Deployment cost</p><h2>Reliability has a measurable price.</h2><p>Clean DEV benchmark. RTF includes extractor and optional generative passes; peak VRAM is the observed process maximum.</p></div>
           <div class="table-wrap compact">
             <table class="cost-table">
-              <thead><tr><th>Configuration</th><th>Candidates</th><th>Q-Full</th><th>RTF ↓</th><th>Peak VRAM</th><th>Swap recovery ↑</th></tr></thead>
+              <thead><tr><th>Configuration</th><th>Candidates</th><th>Qwen-TSE</th><th>RTF ↓</th><th>Peak VRAM</th><th>Swap recovery ↑</th></tr></thead>
               <tbody>
                 <tr><td>Primary</td><td>1</td><td>—</td><td>0.057</td><td>20.37 GiB</td><td>0.00%</td></tr>
-                <tr><td>Pool B direct</td><td>2</td><td>—</td><td>0.105</td><td>20.38 GiB</td><td>83.21%</td></tr>
-                <tr class="highlight"><td>Pool D direct</td><td>5</td><td>—</td><td>0.208</td><td>20.47 GiB</td><td>87.65%</td></tr>
-                <tr><td>Pool B + CSG</td><td>2</td><td>1 pass</td><td>0.473</td><td>20.38 GiB</td><td>79.01%</td></tr>
-                <tr><td>Pool D + CSG</td><td>5</td><td>1 pass</td><td>0.573</td><td>20.47 GiB</td><td>80.74%</td></tr>
+                <tr><td>CDCS-2 direct</td><td>2</td><td>—</td><td>0.105</td><td>20.38 GiB</td><td>83.21%</td></tr>
+                <tr class="highlight"><td>CDCS-5 direct</td><td>5</td><td>—</td><td>0.208</td><td>20.47 GiB</td><td>87.65%</td></tr>
+                <tr><td>CDCS-2 + CSG</td><td>2</td><td>1 pass</td><td>0.473</td><td>20.38 GiB</td><td>79.01%</td></tr>
+                <tr><td>CDCS-5 + CSG</td><td>5</td><td>1 pass</td><td>0.573</td><td>20.47 GiB</td><td>80.74%</td></tr>
               </tbody>
             </table>
           </div>
@@ -268,7 +268,7 @@
         <div class="deliverables">
           <h3>Final evidence package</h3>
           <ul>
-            <li><b>Baseline / ablation:</b> Primary is the main-table single-expert baseline; TF-map remains a disclosed auxiliary control and candidate source; Pool D direct, UD, fixed CSG and selected GNR complete the comparison.</li>
+            <li><b>Baseline / ablation:</b> Primary is the main-table single-expert baseline; TF-map remains a disclosed auxiliary control and candidate source; CDCS-5 direct, Qwen-TSE UD, Qwen-TSE fixed CSG, and Qwen-TSE GNR complete the comparison.</li>
             <li><b>Statistics:</b> 95% paired intervals and switch-specific McNemar tests.</li>
             <li><b>Efficiency:</b> candidate count, forward passes, RTF, latency and peak GPU memory.</li>
             <li><b>Robustness:</b> per-SNR WER, content switch, speaker switch and recovery.</li>

@@ -18,7 +18,7 @@ import soundfile as sf
 ROOT = Path(__file__).resolve().parents[2]
 ANALYSIS = ROOT / "analysis/noisy_wham"
 MANIFESTS = ROOT / "manifests/noisy_wham"
-POOLS = ("pool_full", "pool_b", "pool_d")
+POOLS = ("primary", "cdcs2", "cdcs5")
 FORBIDDEN = ("target", "interferer", "transcript", "sisdr", "si_sdr", "qc", "reference", "label")
 
 

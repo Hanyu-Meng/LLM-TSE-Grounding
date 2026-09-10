@@ -81,8 +81,8 @@ def main() -> int:
         "K": 50 if choose_b else 20,
         "R": 3 if choose_b else 2,
         "selected_dev_slug": (
-            "pool_d_adaptive_csg_gnr_k50_r3" if choose_b
-            else "pool_d_adaptive_csg_gnr_k20_r2"
+            "qwen_tse_adaptive_csg_gnr_cdcs5_k50_r3" if choose_b
+            else "qwen_tse_adaptive_csg_gnr_cdcs5_k20_r2"
         ),
         "selection_rule": (
             "choose GNR-B if P808 or UTMOS improves >=0.005, raw WER rise "

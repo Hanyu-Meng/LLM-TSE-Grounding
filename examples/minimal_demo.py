@@ -3,7 +3,7 @@
 import numpy as np
 
 from llm_tse_grounding import (
-    POOL_D,
+    CDCS5_CANDIDATES,
     VOCAB_SIZE,
     refine_gnr,
     select_by_enrollment_similarity,
@@ -11,9 +11,12 @@ from llm_tse_grounding import (
 )
 
 
-scores = {name: score for name, score in zip(POOL_D, [0.71, 0.68, 0.70, 0.69, 0.79])}
+scores = {
+    name: score
+    for name, score in zip(CDCS5_CANDIDATES, [0.71, 0.68, 0.70, 0.69, 0.79])
+}
 selection = select_by_enrollment_similarity(scores)
-print("Pool-D selection:", selection)
+print("CDCS-5 selection:", selection)
 
 evidence = np.asarray([0, 1, 2], dtype=np.int64)
 logits = np.zeros((3, VOCAB_SIZE), dtype=np.float32)

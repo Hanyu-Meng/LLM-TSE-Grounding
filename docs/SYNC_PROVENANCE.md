@@ -10,18 +10,17 @@ Control path used for the read-only source audit:
 Mac Air -> jollibear -> lab5090
 ```
 
-## Verification
+## Public-code normalization
 
-The curated synchronization compared 95 source/config/test files by SHA-256:
+The source snapshot was reduced to the code paths used by the manuscript.
+General SE modules, workstation launch helpers, data, weights, and generated
+experiment artifacts were removed. Internal lettered candidate-set names were
+renamed to the manuscript terminology (`CDCS-2` and `CDCS-5`), and Qwen-TSE
+systems now use the same public names as the paper. Portable configuration paths
+remain repository-relative.
 
-- 91 files are byte-identical to the lab5090 source;
-- 3 YAML files differ only because workstation-specific absolute paths were
-  replaced with repository-relative placeholders;
-- `freeze_noisy_test_protocol.py` differs only because three user-specific
-  cache paths were replaced by `LLM_TSE_CACHE_ROOT`, defaulting to `~/.cache`.
-
-All 91 synced Python files passed `compileall`. The dependency-light reference
-suite passed 9/9 tests, and the minimal operator example completed. The TSE
+Every retained Python file is checked with `compileall`. The dependency-light
+reference suite and minimal operator example are run before release. The TSE
 Torch contract test is included but requires the optional full-pipeline
 dependencies.
 
@@ -30,7 +29,7 @@ dependencies.
 - Qwen/WavLM TSE model and data contract;
 - CosyVoice3 S3 codec adapter;
 - training and decode entry points;
-- frozen WeSep candidate generation and Pool-D selection;
+- frozen WeSep candidate generation and CDCS-5 selection;
 - Clean selected-evidence generation and evaluation;
 - Natural-WHAM!/controlled-SNR preparation and evaluation;
 - CSG/GNR decode logic, paired statistics, reporting, and TEST freeze checks.
@@ -44,5 +43,7 @@ dependencies.
   files;
 - failed recovery/learned-selector branches;
 - post-TEST DEV selective-router and multi-lambda/token-level experiments.
+- general speech-enhancement training and evaluation modules not used in the
+  manuscript.
 
 No files on lab5090 were modified during synchronization.

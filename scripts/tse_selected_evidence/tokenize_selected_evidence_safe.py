@@ -30,9 +30,9 @@ from se_align.codec.cosyvoice3_codec import CosyVoice3S3Tokenizer  # noqa: E402
 ANALYSIS = ROOT / "analysis/selected_evidence"
 ORDER = ("full", "first", "middle", "final", "tfmap_context_full")
 POOLS = {
-    "pool_full": ("full",),
-    "pool_b": ("full", "tfmap_context_full"),
-    "pool_d": ORDER,
+    "primary": ("full",),
+    "cdcs2": ("full", "tfmap_context_full"),
+    "cdcs5": ORDER,
 }
 FORBIDDEN_KEY_PARTS = (
     "target", "interferer", "transcript", "sisdr", "si_sdr", "qc", "reference", "label"

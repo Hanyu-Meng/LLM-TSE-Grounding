@@ -4,7 +4,10 @@ import unittest
 
 import numpy as np
 
-from llm_tse_grounding.candidate_selection import POOL_D, select_by_enrollment_similarity
+from llm_tse_grounding.candidate_selection import (
+    CDCS5_CANDIDATES,
+    select_by_enrollment_similarity,
+)
 from llm_tse_grounding.csg import csg_penalize_logits, select_csg_tokens
 from llm_tse_grounding.difficulty import residual_difficulty, source_threshold_lambda
 from llm_tse_grounding.fsq import VOCAB_SIZE, digits_to_ids, hamming_distance, ids_to_digits
@@ -25,11 +28,14 @@ class FSQTests(unittest.TestCase):
 
 class CandidateSelectionTests(unittest.TestCase):
     def test_highest_similarity_wins(self):
-        scores = {name: 0.1 + index / 10 for index, name in enumerate(POOL_D)}
+        scores = {
+            name: 0.1 + index / 10
+            for index, name in enumerate(CDCS5_CANDIDATES)
+        }
         self.assertEqual(select_by_enrollment_similarity(scores).candidate, "tfmap_context_full")
 
     def test_tie_uses_declared_order(self):
-        scores = {name: 0.5 for name in POOL_D}
+        scores = {name: 0.5 for name in CDCS5_CANDIDATES}
         self.assertEqual(select_by_enrollment_similarity(scores).candidate, "full")
 
 

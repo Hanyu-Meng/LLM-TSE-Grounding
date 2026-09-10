@@ -36,7 +36,7 @@ def parse_args() -> argparse.Namespace:
     source.add_argument("--token-records", type=Path)
     source.add_argument(
         "--manifest-token-field",
-        choices=("pool_b_evidence_token_path", "pool_d_evidence_token_path"),
+        choices=("cdcs2_evidence_token_path", "cdcs5_evidence_token_path"),
     )
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument(

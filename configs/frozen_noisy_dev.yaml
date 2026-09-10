@@ -6,7 +6,7 @@ fsq:
   digits: 8
   vocabulary_size: 6561
 
-pool_d:
+cdcs5:
   candidate_order:
     - full
     - first

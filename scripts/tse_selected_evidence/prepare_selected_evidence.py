@@ -27,10 +27,10 @@ NATURAL_AUDIT = ROOT / "analysis/wesep_speaker_selection/dev_all_trials.jsonl"
 PRIMARY_METRICS = ROOT / "dev_outputs/WeSep/per_trial_metrics.jsonl"
 ORDER = ("full", "first", "middle", "final", "tfmap_context_full")
 POOLS = {
-    "pool_a": ("full",),
-    "pool_b": ("full", "tfmap_context_full"),
-    "pool_c": ("full", "first", "middle", "final"),
-    "pool_d": ORDER,
+    "primary_only": ("full",),
+    "cdcs2": ("full", "tfmap_context_full"),
+    "wesep_multiview": ("full", "first", "middle", "final"),
+    "cdcs5": ORDER,
 }
 
 
@@ -362,7 +362,7 @@ def tokenize(args: argparse.Namespace) -> int:
     for index, row in enumerate(rows, 1):
         paths = {}
         candidate_names = {}
-        for pool in ("pool_b", "pool_d"):
+        for pool in ("cdcs2", "cdcs5"):
             name = row["selected"][pool]
             source = row["candidates"][name]["waveform_path"]
             mixture_samples = int(sf.info(row["mixture_wav"]).frames)
@@ -423,21 +423,21 @@ def tokenize(args: argparse.Namespace) -> int:
             "mixture_wav": row["mixture_wav"],
             "enrollment_wav": row["enrollment_wav"],
             "speaker_embedding_path": row["speaker_embedding_path"],
-            "pool_b_evidence_token_path": paths["pool_b"],
-            "pool_d_evidence_token_path": paths["pool_d"],
-            "pool_b_selected_candidate": candidate_names["pool_b"],
-            "pool_d_selected_candidate": candidate_names["pool_d"],
+            "cdcs2_evidence_token_path": paths["cdcs2"],
+            "cdcs5_evidence_token_path": paths["cdcs5"],
+            "cdcs2_direct_candidate": candidate_names["cdcs2"],
+            "cdcs5_direct_candidate": candidate_names["cdcs5"],
         })
         source_eval = prepared[row["trial_id"]]
         evaluation.append(dict(source_eval) | {
             "cohort": row["cohort"],
-            "pool_b_selected_candidate": candidate_names["pool_b"],
-            "pool_d_selected_candidate": candidate_names["pool_d"],
-            "pool_b_selected_waveform": next(
-                item["aligned_waveform"] for item in records[-2:] if item["pool"] == "pool_b"
+            "cdcs2_direct_candidate": candidate_names["cdcs2"],
+            "cdcs5_direct_candidate": candidate_names["cdcs5"],
+            "cdcs2_direct_waveform": next(
+                item["aligned_waveform"] for item in records[-2:] if item["pool"] == "cdcs2"
             ),
-            "pool_d_selected_waveform": next(
-                item["aligned_waveform"] for item in records[-2:] if item["pool"] == "pool_d"
+            "cdcs5_direct_waveform": next(
+                item["aligned_waveform"] for item in records[-2:] if item["pool"] == "cdcs5"
             ),
         })
         if index == 1 or index % 200 == 0 or index == len(rows):
