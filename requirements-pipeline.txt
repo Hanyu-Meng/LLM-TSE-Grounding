@@ -1,0 +1,22 @@
+# Full research-pipeline dependencies beyond the lightweight NumPy package.
+# Install inside an environment compatible with your CosyVoice3 checkout.
+
+-r requirements.txt
+
+PyYAML>=6
+soundfile>=0.12
+scipy>=1.10
+pandas>=2.0
+pyloudnorm>=0.1.1
+librosa>=0.10
+jiwer>=3.0
+pesq>=0.0.4
+pystoi>=0.4
+pyarrow>=14
+tensorboard>=2.14
+torch>=2.1
+transformers>=4.40
+
+# Optional metric backends used by the full campaign may require installation
+# in their own compatible environments: speechmos, onnxruntime/onnxruntime-gpu,
+# UTMOS via SpeechMOS, SpeechBERTScore, LPS, and VQScore.

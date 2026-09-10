@@ -1,10 +1,15 @@
-# Internal-to-public code map
+# Compact-to-full code map
 
-This repository is a deliberately compact extraction of the research code used
-on the lab workstation. Machine orchestration and generated artifacts were not
-copied. The public modules preserve the following method logic:
+The repository contains two complementary implementation layers:
 
-| Internal campaign source | Public module | Preserved behavior |
+- `src/llm_tse_grounding/`: dependency-light NumPy operators for auditing core
+  method invariants;
+- `se_align/` and `scripts/`: the curated Torch/CosyVoice/WeSep research
+  pipeline used to generate and evaluate the paper systems.
+
+Machine orchestration and generated artifacts are not copied. The mapping is:
+
+| Full research implementation | Compact module | Preserved behavior |
 |---|---|---|
 | `se_align/train/fsq_neighbors.py` | `fsq.py` | 3^8 ID factorization and Hamming geometry |
 | `scripts/tse_candidate_gate/aggregate_candidate_gate.py` | `candidate_selection.py` | frozen Pool-D order and enrollment-cosine selection |
@@ -13,6 +18,10 @@ copied. The public modules preserve the following method logic:
 | `scripts/tse_noisy_wham/build_noisy_difficulty.py` | `difficulty.py` | deployable residual-ratio feature and source thresholds |
 | `scripts/tse_noisy_wham/paired_noisy_statistics.py` | `statistics.py` | paired bootstrap convention |
 
-The public implementation uses NumPy so its invariants can be audited on CPU.
-It does not include private absolute paths, scheduler wrappers, cached metrics,
-data manifests, model checkpoints, audio, or third-party repositories.
+The compact implementation uses NumPy so its invariants can be audited on CPU.
+The full implementation remains under its original module paths so campaign
+scripts and imports stay traceable. Neither layer includes private absolute
+paths, scheduler wrappers, cached metrics, data manifests, model checkpoints,
+bulk audio, or third-party repositories.
+
+See `PIPELINE.md` for the stage-by-stage entry points.

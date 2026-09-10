@@ -18,12 +18,18 @@ CSG receives the selected evidence tokens and changes only the audio-token
 scores. GNR receives one teacher-forced logit pass over an immutable complete
 anchor. Refined GNR tokens are never fed into later histories.
 
-## What is intentionally absent
+## Code and artifact boundary
 
-This repository does not redistribute LibriSpeech, LibriMix/WHAM, model weights,
-generated audio, speaker embeddings, token caches, ASR transcripts, or
-third-party code. Obtain those assets from their respective owners and use the
-portable method operators here inside your own inference pipeline.
+The repository includes the curated TSE model, data contracts, candidate
+selection, grounding, synthesis adapters, evaluation, statistics, and report
+generation code. It does not redistribute LibriSpeech, LibriMix/WHAM!, model
+weights, generated audio, speaker embeddings, token caches, ASR transcripts,
+or third-party code. Obtain those assets from their respective owners and point
+the portable example configs at their local locations.
+
+Post-TEST selective routing and multi-lambda/token-level DEV experiments are
+excluded from this snapshot. They are method-development evidence rather than
+the frozen paper system and must not be represented as held-out TEST gains.
 
 ## Recommended checks
 
@@ -35,3 +41,6 @@ portable method operators here inside your own inference pipeline.
 6. Verify selected candidates use enrollment similarity only.
 7. Report switch counts and denominators together with rates.
 8. Use paired resampling on common trial IDs for system comparisons.
+9. Keep Natural Noisy and controlled-SNR aggregates separate.
+10. Verify `execution_count=1` and `post_test_tuning=false` before citing Noisy
+    TEST results.

@@ -1,0 +1,29 @@
+task: target_speaker_extraction
+
+models:
+  generator_checkpoint: null
+  qwen_path: ./pretrained/Qwen2.5-0.5B-Instruct
+  wavlm_path: ./pretrained/wavlm-base-plus
+  cosyvoice_root: ./external/CosyVoice
+  cosyvoice3_model: ./pretrained/Fun-CosyVoice3-0.5B
+  wesep_checkpoint: ./pretrained/wesep/spk_emb_100
+
+data:
+  dev_manifest: ./manifests/tse_dev.jsonl
+  test_manifest: ./manifests/tse_test.jsonl
+  debug_manifest: ./debug_manifests/tse_debug_4trials.jsonl
+
+decode:
+  mode: ud
+  sample_rate: 16000
+  output_dir: ./artifacts/tse/decode
+
+grounding:
+  training_free: true
+  csg:
+    enabled: false
+    lambda: 0.0
+  crg:
+    enabled: false
+  nmsg:
+    enabled: false

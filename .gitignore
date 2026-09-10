@@ -43,8 +43,18 @@ analysis/
 *.pth
 *.ckpt
 *.onnx
+*.safetensors
+*.bin
+*.pkl
+*.joblib
+*.parquet
+*.lmdb
+*.sqlite
+*.sqlite3
 *.jsonl
 *.log
+wandb/
+tensorboard/
 
 # Curated, small listening examples intentionally shipped with the paper demo.
 !demo/public/assets/audio/

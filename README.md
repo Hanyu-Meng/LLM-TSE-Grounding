@@ -1,79 +1,56 @@
 # LLM-TSE Grounding
 
-Compact research code for **Repair Before Grounding** in LLM-based target
-speaker extraction (TSE).
+Research code for **speaker-consistent grounding and confusion repair in
+LLM-based target speaker extraction (TSE)**.
 
-The central failure mode is not always noisy or silent output: a TSE system can
-produce fluent speech from the *wrong speaker*. Passing that waveform directly
-to a generative speech model gives the model unreliable evidence. This project
-therefore separates the problem into two stages:
+An LLM speech generator can produce natural-sounding output while drifting in
+speaker identity or lexical content. This project addresses the problem in two
+steps:
 
-1. **Confusion repair:** generate complementary frozen TSE candidates and use
-   target-enrollment speaker consistency to select the most reliable evidence.
-2. **Grounded generation:** constrain LLM audio-token decoding to remain close
-   to the repaired evidence in the native FSQ code space.
+1. **Repair before grounding.** Generate complementary frozen TSE candidates
+   and select the waveform most consistent with the target enrollment.
+2. **Grounded generation.** Constrain autoregressive S3-token generation to
+   remain close to the selected evidence in the native FSQ code space.
 
-This repository is the cleaned, portable core of the larger experimental
-pipeline used for an ICASSP 2027 study. It intentionally contains method code,
-small tests, frozen configuration metadata, compact result summaries, the
-paper source, and a curated listening demo. It does not contain server
-orchestration, checkpoints, manifests, private paths, or bulk generated
-outputs.
+This private repository now contains both the small NumPy reference operators
+and the curated end-to-end research pipeline used for the ICASSP 2027 study.
+Data, model weights, generated audio, caches, machine orchestration, and private
+server paths are deliberately excluded.
 
-## Paper and interactive demo
-
-- [`paper/`](paper/) contains the compact ICASSP manuscript source and the
-  latest rendered draft. Table 1 is reserved for frozen TEST results; Table 2
-  permanently preserves the full Noisy DEV selection and ablation evidence.
-- [`demo/`](demo/) contains a standalone research-story page with three
-  independent result views: Clean TEST, Noisy DEV, and Noisy TEST. Importing a
-  completed Noisy TEST payload updates only the Noisy TEST view and never
-  overwrites DEV.
-
-Run the demo locally:
-
-```bash
-python -m http.server 8000 --directory demo
-```
-
-Then open `http://127.0.0.1:8000/`. The demo links back to this repository so
-the narrative, frozen configuration, method implementation, and paper source
-remain traceable from one place.
-
-## Method at a glance
+## Method overview
 
 ```mermaid
 flowchart LR
-    M[Mixture] --> P[Primary TSE]
-    M --> A[Alternative TSE expert]
-    E[Target enrollment] --> V[Full + deterministic views]
-    V --> P
-    E --> A
-    P --> C[Five candidate waveforms]
-    A --> C
-    E --> S[Enrollment-cosine selector]
+    M[Mixture] --> W1[Primary WeSep]
+    M --> W2[TF-map/context WeSep]
+    E[Target enrollment] --> V[Full / early / middle / late views]
+    V --> W1
+    E --> W2
+    W1 --> C[Five waveform candidates]
+    W2 --> C
+    E --> S[Enrollment-consistency selector]
     C --> S
     S --> D[Pool-D direct output]
-    S --> T[Evidence tokens]
-    T --> Q[Q-Full decoder]
-    Q --> G[CSG]
+    S --> Z[S3 evidence tokens]
+    Z --> Q[Qwen-TSE]
+    Q --> G[Code-space grounding]
+    G --> A[Grounded waveform]
     G --> R[Optional GNR ablation]
 ```
 
-### 1. Pool-D confusion repair
+### Pool-D confusion repair
 
 Pool-D contains five frozen candidates:
 
-- `full`, `first`, `middle`, `final`: one speaker-embedding TSE checkpoint with
-  deterministic enrollment views;
-- `tfmap_context_full`: an alternative checkpoint using TF-map/context
-  conditioning.
+- `full`, `first`, `middle`, and `final` from one speaker-embedding TSE model
+  with deterministic enrollment views;
+- `tfmap_context_full` from the complementary TF-map/context checkpoint.
 
-The deployable selector chooses the maximum cosine similarity between each
-candidate output and the target enrollment. It does **not** use clean target
-audio, interferer references, transcripts, WER, or SI-SDR.
+The deployable selector uses only target-enrollment speaker similarity. It
+never uses the clean target, interferer reference, transcript, WER, SI-SDR, or
+an oracle label.
 
-### 2. Code-space grounding (CSG)
+### Code-space grounding (CSG)
 
 CosyVoice3 S3 tokens use an eight-coordinate ternary FSQ vocabulary:
 
@@ -82,88 +59,56 @@ vocabulary size = 3^8 = 6561
 token id = sum(digit[d] * 3^d), d = 0..7
 ```
 
-At generation step `t`, CSG applies
+At generation step `t`, fixed CSG applies
 
 ```text
-grounded_logit(v) = llm_logit(v) - lambda * min_delta Hamming(v, evidence[t + delta])
+grounded_logit(v) = llm_logit(v)
+                    - lambda * min_delta Hamming(v, evidence[t + delta])
 ```
 
-where `delta` is controlled by the temporal tolerance. The frozen fixed system
-uses `lambda=1, w=0`.
+The frozen reliability operating point uses `lambda=1` and temporal tolerance
+`w=0`.
 
-### 3. Grounded neighborhood refinement (GNR)
+### Grounded-neighborhood refinement (GNR)
 
-GNR is a conservative ablation around a complete CSG anchor. At each position,
-the candidate set is
+GNR is a conservative ablation around a complete CSG anchor:
 
 ```text
-TopK(Q-Full logits) ∩ HammingBall_R(anchor) ∪ {anchor}
+candidate set = TopK(Q-Full logits) ∩ HammingBall_R(anchor) ∪ {anchor}
 ```
 
-The logits are computed once with teacher forcing over the **immutable original
-anchor**. Refined tokens never feed later histories. DEV selected `K=20, R=2`
+Teacher-forced logits are computed against the immutable original anchor;
+refined tokens are never fed into later histories. DEV selected `K=20, R=2`
 within the GNR family, but GNR did not outperform fixed CSG overall.
 
-## Frozen Noisy DEV snapshot
+## What is included
 
-All rows contain the same 8,400 DEV trials. These are DEV results, not final
-Noisy TEST claims.
+| Path | Purpose |
+|---|---|
+| `src/llm_tse_grounding/` | Lightweight NumPy implementations of Pool-D selection, FSQ geometry, CSG, GNR, and paired statistics |
+| `se_align/tse/` | Qwen/WavLM target-speaker token model |
+| `se_align/train/` | Token vocabulary, projectors, datasets, and training utilities |
+| `se_align/codec/` | CosyVoice3 S3 tokenizer and waveform synthesis adapter |
+| `se_align/data/` | Manifest, waveform, token, and TSE dataset contracts |
+| `se_align/eval/` | ASR-consistency, speaker, intrusive, and perceptual metric implementations |
+| `scripts/tse/` | Manifest preparation, feature extraction, training, decoding, and baseline evaluation |
+| `scripts/tse_candidate_gate/` | Frozen WeSep candidate generation, embedding extraction, scoring, selection, and validation |
+| `scripts/tse_selected_evidence/` | Clean selected-evidence tokenization, generation, evaluation, and paper-table compilation |
+| `scripts/tse_noisy_wham/` | WHAM! preparation, noisy candidate analysis, CSG/GNR decoding, frozen protocol checks, evaluation, and paired statistics |
+| `configs/tse_*.yaml` | Portable examples of the experiment configuration |
+| `tests/` | Lightweight operator tests and TSE data/model contract tests |
+| `paper/` | ICASSP manuscript source and rendered draft |
+| `demo/` | Standalone project/demo page |
 
-| System | Raw WER ↓ | Content switch ↓ | Acoustic switch ↓ | Speaker margin ↑ | DNSMOS-OVRL ↑ | UTMOS ↑ |
-|---|---:|---:|---:|---:|---:|---:|
-| Primary WeSep | 53.50 | 20.11% | 19.54% | 0.269 | 2.243 | 1.997 |
-| **Pool-D direct** | **46.75** | **11.86%** | 10.93% | 0.332 | 2.132 | 1.930 |
-| Q-Full UD | 66.87 | 13.68% | 2.99% | 0.362 | 3.063 | **3.164** |
-| **Fixed CSG** | **62.66** | 13.44% | **1.27%** | **0.370** | 3.066 | 3.047 |
-| Adaptive CSG | 62.92 | **13.42%** | 1.64% | 0.369 | 3.079 | 3.104 |
-| Selected GNR (`K20/R2`) | 65.96 | 13.44% | 1.67% | 0.369 | **3.081** | 3.118 |
-
-The intended interpretation is deliberately two-operating-point:
-
-- **Pool-D direct** is the fidelity-oriented result and gives the best WER.
-- **Fixed CSG** is the strongest generative reliability arm: relative to
-  ungrounded Q-Full it reduces WER and acoustic speaker switches while
-  preserving predicted perceptual quality.
-- Adaptive CSG and GNR are useful negative ablations. They slightly increase
-  predicted quality but do not improve reliability over fixed CSG.
-
-Raw WER is high because the aggregate includes controlled -5/0/5/10/15 dB
-conditions and ASR insertions; a single utterance can have raw WER above 100%.
-
-![Noisy DEV speaker-confusion versus quality trade-off](assets/noisy_dev_tradeoff.svg)
-
-## Repository layout
-
-```text
-src/llm_tse_grounding/
-  candidate_selection.py  # deterministic Pool-D selector
-  fsq.py                   # 3^8 FSQ conversion and Hamming geometry
-  csg.py                   # CSG logit penalty
-  gnr.py                   # immutable-anchor neighborhood refinement
-  difficulty.py            # deployable residual-ratio ablation
-  statistics.py            # Wilson CI and paired bootstrap
-  cli.py                    # small file-based command line interface
-configs/
-  frozen_noisy_dev.yaml    # path-free frozen choices
-examples/
-  minimal_demo.py          # CPU-only operator demo
-tests/
-  test_core.py             # invariant and regression tests
-results/
-  noisy_dev_summary.csv    # compact source data for the table above
-paper/
-  main.tex                 # ICASSP manuscript
-  results_macros.tex       # centralized frozen result values
-  tables/                  # TEST, DEV-ablation, mechanism, and cost tables
-demo/
-  index.html               # standalone paper/demo page
-  app.js                   # split-safe result rendering
-docs/
-  CODE_MAP.md              # mapping from internal campaign code
-  REPRODUCIBILITY.md       # leakage and evaluation boundaries
-```
+The detailed stage-by-stage entry points are documented in
+[`docs/PIPELINE.md`](docs/PIPELINE.md). The relationship between the compact
+operators and full research scripts is documented in
+[`docs/CODE_MAP.md`](docs/CODE_MAP.md); the lab5090 synchronization audit is in
+[`docs/SYNC_PROVENANCE.md`](docs/SYNC_PROVENANCE.md).
 
 ## Installation
+
+### Lightweight operator package
 
 ```bash
 git clone https://github.com/Hanyu-Meng/LLM-TSE-Grounding.git
@@ -173,64 +118,104 @@ source .venv/bin/activate
 python -m pip install -e .
 ```
 
-The portable core requires only NumPy. Full waveform/token generation still
-requires your own integrations for the frozen TSE models, Qwen, WavLM, and
-CosyVoice3.
+This installs the auditable NumPy reference implementation and CLI.
 
-## Quick checks
+### Full research pipeline
+
+The full pipeline depends on PyTorch, Transformers, audio/metric packages, and
+external frozen components:
 
 ```bash
-python -m unittest discover -s tests -v
+python -m pip install -r requirements-pipeline.txt
+```
+
+For the exact CosyVoice3 environment, install its dependencies first and then
+install the additional metric packages without forcing incompatible Torch or
+ONNX Runtime versions. See [`configs/README.md`](configs/README.md) before
+running an experiment.
+
+Required external assets are expected under ignored directories such as:
+
+```text
+external/CosyVoice/
+external/wesep-real-tse/
+external/LibriMix/
+external/LibriSpeech/
+external/wham_noise/
+pretrained/Qwen2.5-0.5B-Instruct/
+pretrained/wavlm-base-plus/
+pretrained/Fun-CosyVoice3-0.5B/
+pretrained/wesep/
+```
+
+No third-party model, corpus, or checkpoint is redistributed here.
+
+## Quick validation
+
+Run the CPU-only reference checks:
+
+```bash
+python -m unittest discover -s tests -p 'test_core.py' -v
 python examples/minimal_demo.py
 llm-tse-grounding --help
 ```
 
-File-based operator examples:
+With the full pipeline dependencies installed, run the TSE contract test:
 
 ```bash
-# Apply a CSG penalty to T x 6561 logits.
-llm-tse-grounding csg \
-  --logits llm_logits.npy \
-  --evidence evidence_tokens.npy \
-  --lambda 1.0 \
-  --temporal-tolerance 0 \
-  --output grounded_tokens.npy
-
-# Refine an immutable anchor using teacher-forced Q-Full logits.
-llm-tse-grounding gnr \
-  --logits teacher_forced_logits.npy \
-  --anchor anchor_tokens.npy \
-  --top-k 20 \
-  --radius 2 \
-  --output refined_tokens.npy \
-  --stats gnr_stats.json
+python -m pytest tests/test_tse.py -q
 ```
 
-See [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md) before integrating the
-operators into an evaluation pipeline.
+Compile every synced Python source without importing model dependencies:
 
-## External components
+```bash
+python -m compileall -q src se_align scripts tests
+```
 
-This repository does not vendor third-party code or weights. The full research
-system builds on:
+## Reproducibility boundary
+
+- Model and policy choices are made on DEV only.
+- Clean TEST and Natural Noisy TEST are frozen confirmation sets.
+- Noisy TEST was executed once: `execution_count=1`,
+  `post_test_tuning=false`.
+- Natural-noise and controlled-SNR results are reported separately.
+- Uncapped utterance-mean WER is not replaced by capped WER.
+- Speaker/content switch rates, trial counts, and paired uncertainty are
+  reported together.
+- The post-TEST DEV router and multi-lambda/token-level method-development
+  experiments are not included in this repository snapshot.
+
+Read [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md) before adapting the
+pipeline or interpreting the result tables.
+
+## Paper and demo
+
+- [`paper/`](paper/) contains the ICASSP manuscript source and latest bundled
+  draft available in this repository snapshot.
+- [`demo/`](demo/) contains a standalone local project page.
+- The public listening page is maintained separately at
+  [hanyu-meng.github.io/LLM-TSE-Grounding-Demo](https://hanyu-meng.github.io/LLM-TSE-Grounding-Demo/).
+
+Run the bundled demo locally:
+
+```bash
+python -m http.server 8000 --directory demo
+```
+
+Then open `http://127.0.0.1:8000/`.
+
+## External projects
+
+The pipeline builds on:
 
 - [WeSep](https://github.com/wenet-e2e/wesep) for target speaker extraction;
-- [CosyVoice](https://github.com/QwenAudio/CosyVoice) for S3 tokenization and
+- [CosyVoice](https://github.com/FunAudioLLM/CosyVoice) for S3 tokenization and
   waveform synthesis;
-- [Qwen2.5](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct) as the token
-  language-model backbone;
-- [LibriMix](https://github.com/JorisCos/LibriMix) and WHAM! noise for the noisy
-  evaluation setting.
+- [Qwen2.5](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct) as the language
+  model backbone;
+- [WavLM](https://huggingface.co/microsoft/wavlm-base-plus) for mixture
+  features;
+- [LibriMix](https://github.com/JorisCos/LibriMix), LibriSpeech, and WHAM! for
+  clean and noisy TSE evaluation.
 
-Data, checkpoints, bulk generated audio, transcripts, embeddings, and
-server-specific paths are intentionally excluded. A small set of curated clean
-listening examples is included under `demo/public/assets/audio/` solely to make
-the paper's failure-and-repair cases inspectable. Each external component and
-source corpus remains subject to its own license and usage terms.
-
-## Status
-
-The compact method core, manuscript, demo, frozen Clean TEST evidence, and full
-Noisy DEV snapshot are available here. The one-run frozen Noisy TEST evaluation
-is not inserted until its full pipeline and artifact checks are complete. No
-post-TEST tuning is permitted.
+Each dependency and corpus remains subject to its own license and terms.

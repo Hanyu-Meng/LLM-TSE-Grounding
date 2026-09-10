@@ -1,0 +1,82 @@
+task: target_speaker_extraction
+
+architecture:
+  model: QwenWavLMTSE
+  prefix_order: [speaker, wavlm_mixture, evidence_fsq, target_teacher_forcing]
+  mixture_feature_dim: 768
+  speaker_embedding_dim: 192
+  qwen_hidden_dim: 896
+  output_vocab_size: 6561
+  output_length_mode: target_aligned
+
+models:
+  qwen_path: ./pretrained/Qwen2.5-0.5B-Instruct
+  wavlm_path: ./pretrained/wavlm-base-plus
+  cosyvoice_root: ./external/CosyVoice
+  cosyvoice3_model: ./pretrained/Fun-CosyVoice3-0.5B
+  wesep_repo: ./external/wesep-real-tse
+  wesep_checkpoint: ./pretrained/wesep/spk_emb_100
+  evase_checkpoint: null
+
+freeze:
+  wesep: true
+  cosyvoice3_tokenizer: true
+  wavlm: true
+  speaker_encoder: true
+
+tokens:
+  codec: cosyvoice3_s3
+  frame_rate_hz: 25
+  raw_vocab_size: 6561
+  raw_id_min: 0
+  raw_id_max: 6560
+
+data:
+  train_manifest: ./manifests/tse_train.jsonl
+  dev_manifest: ./manifests/tse_dev.jsonl
+  test_manifest: ./manifests/tse_test.jsonl
+  debug_manifest: ./debug_manifests/tse_debug_4trials.jsonl
+  debug_prepared_manifest: ./debug_manifests/tse_debug_4trials_prepared.jsonl
+  train_prepared_manifest: ./manifests/tse_train_prepared_qc_v2.jsonl
+  dev_prepared_manifest: ./manifests/tse_dev_prepared.jsonl
+  test_prepared_manifest: ./manifests/tse_test_prepared.jsonl
+  sample_rate: 16000
+
+outputs:
+  evidence_wav_root: ./artifacts/tse/evidence_wav
+  evidence_token_root: ./artifacts/tse/evidence_tokens
+  target_token_root: ./artifacts/tse/target_tokens
+  debug_feature_root: ./artifacts/tse/debug_features
+  checkpoint_dir: ./exp/tse_qwen_wavlm_fsq
+
+training:
+  initialization: raw_qwen_to_tse
+  seed: 0
+  epochs: 5
+  batch_size: 1
+  dev_batch_size: 1
+  gradient_accumulation_steps: 8
+  effective_batch_size: 8
+  learning_rate: 2.0e-5
+  projector_learning_rate: 1.0e-4
+  weight_decay: 0.01
+  warmup_ratio: 0.05
+  max_grad_norm: 1.0
+  dtype: bfloat16
+  num_workers: 4
+  gradient_checkpointing: true
+  log_interval: 20
+  s3_diagnostic_interval: 100
+  validation_interval: 1_epoch
+  checkpoint_interval: 1_epoch
+  checkpoint_selection: dev_loss
+  max_sequence_length: dynamic_unbounded
+  wandb: disabled
+  auto_extension:
+    enabled: true
+    decision_after_epoch: 5
+    maximum_epoch: 8
+    criterion: epoch_5_is_best_and_relative_dev_loss_improvement_ge_0p5_percent
+    qwen_learning_rate: 5.0e-6
+    projector_learning_rate: 2.5e-5
+    scheduler: cosine_restart_without_warmup
